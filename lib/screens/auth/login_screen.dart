@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zippy/screens/auth/signup_screen.dart';
 import 'package:zippy/screens/home_screen.dart';
+import 'package:zippy/screens/initial_home_screen.dart';
 import 'package:zippy/utils/colors.dart';
 import 'package:zippy/widgets/button_widget.dart';
 import 'package:zippy/widgets/text_widget.dart';
@@ -21,7 +22,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: secondary,
       body: Column(
         children: [
           Expanded(
@@ -36,6 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     logo,
                     width: 191,
                     height: 80,
+                    color: secondary,
                   ),
                   const SizedBox(
                     height: 12.5,
@@ -43,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextWidget(
                     text: 'Hi! Welcome',
                     fontSize: 25,
-                    color: Colors.white,
+                    color: secondary,
                   ),
                 ],
               ),
@@ -53,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
             width: double.infinity,
             height: 450,
             decoration: const BoxDecoration(
-                color: Colors.white,
+                color: secondary,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(
                     30,
@@ -71,50 +72,56 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextWidget(
                     text: 'Log in',
                     fontSize: 32,
-                    color: secondary,
+                    color: Colors.white,
                     fontFamily: 'Medium',
                   ),
                   const SizedBox(
                     height: 25,
                   ),
                   TextFieldWidget(
+                    labelcolor: Colors.white,
+                    hintColor: Colors.white,
+                    borderColor: Colors.white,
                     height: 80,
-                    length: 9,
                     inputType: TextInputType.number,
-                    prefix: TextWidget(
-                      text: '+63',
-                      fontSize: 24,
-                      color: Colors.black,
-                      fontFamily: 'Medium',
-                    ),
-                    borderColor: secondary,
-                    label: 'Mobile Number',
+                    color: Colors.white,
+                    label: 'Rider ID',
                     controller: number,
+                    hint: 'Enter you 12-digit Rider ID',
                   ),
                   TextFieldWidget(
-                    suffix: Padding(
-                      padding:
-                          const EdgeInsets.only(right: 10, top: 10, bottom: 10),
-                      child: ButtonWidget(
-                        height: 10,
-                        width: 75,
-                        fontSize: 12,
-                        label: 'Get OTP',
-                        onPressed: () {},
+                    showEye: true,
+                    isObscure: true,
+                    labelcolor: Colors.white,
+                    height: 80,
+                    color: Colors.white,
+                    label: 'Password',
+                    controller: otp,
+                    hint: 'Enter your Password',
+                    hintColor: Colors.white,
+                    borderColor: Colors.white,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 25),
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: GestureDetector(
+                        onTap: () {},
+                        child: TextWidget(
+                          text: 'Forgot Password?',
+                          fontSize: 15,
+                          color: Colors.white,
+                          fontFamily: 'Bold',
+                        ),
                       ),
                     ),
-                    height: 80,
-                    length: 6,
-                    inputType: TextInputType.number,
-                    borderColor: secondary,
-                    label: 'Enter OTP',
-                    controller: otp,
-                    hint: 'Enter 6-digit Code',
                   ),
                   const SizedBox(
-                    height: 10,
+                    height: 20,
                   ),
                   ButtonWidget(
+                    textColor: secondary,
+                    color: Colors.white,
                     height: 50,
                     width: 320,
                     fontSize: 20,
@@ -122,76 +129,28 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () {
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
-                            builder: (context) => const HomeScreen()),
+                            builder: (context) => const InitialHomeScreen()),
                       );
                     },
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(
-                          width: 110,
-                          child: Divider(
-                            color: secondary,
-                          )),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 5, right: 5),
-                        child: TextWidget(
-                          text: 'or log in with',
-                          fontSize: 12,
-                          color: secondary,
-                        ),
-                      ),
-                      const SizedBox(
-                          width: 110,
-                          child: Divider(
-                            color: secondary,
-                          )),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      for (int i = 0; i < socials.length; i++)
-                        Padding(
-                          padding: const EdgeInsets.only(left: 5, right: 5),
-                          child: Image.asset(
-                            socials[i],
-                            width: 54,
-                            height: 54,
-                          ),
-                        ),
-                    ],
                   ),
                   const SizedBox(
                     height: 20,
                   ),
                   TextWidget(
-                    text: 'Don’t have an account ?',
+                    text: 'Want to become a Merchant?',
                     fontSize: 14,
-                    color: Colors.grey,
+                    color: Colors.white,
                     fontFamily: 'Medium',
                   ),
                   const SizedBox(
                     height: 2.5,
                   ),
                   GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                            builder: (context) => const SignupScreen()),
-                      );
-                    },
+                    onTap: () {},
                     child: TextWidget(
-                      text: 'Create an Account',
+                      text: 'Learn how',
                       fontSize: 15,
-                      color: Colors.black,
+                      color: Colors.white,
                       fontFamily: 'Bold',
                     ),
                   ),

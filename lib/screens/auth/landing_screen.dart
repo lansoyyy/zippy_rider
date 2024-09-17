@@ -3,6 +3,7 @@ import 'package:zippy/screens/auth/login_screen.dart';
 import 'package:zippy/utils/colors.dart';
 import 'package:zippy/utils/const.dart';
 import 'package:zippy/widgets/button_widget.dart';
+import 'package:zippy/widgets/text_widget.dart';
 
 class LandingScreen extends StatelessWidget {
   const LandingScreen({super.key});
@@ -10,7 +11,6 @@ class LandingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: secondary,
       body: Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -22,18 +22,20 @@ class LandingScreen extends StatelessWidget {
               logo,
               width: 250,
               height: 104,
+              color: secondary,
             ),
-            Image.asset(
-              label,
-              width: 250,
-              height: 40,
+            TextWidget(
+              text: 'RIDERS',
+              fontSize: 30,
+              fontFamily: 'Bold',
+              color: secondary,
             ),
             const SizedBox(
               height: 100,
             ),
             ButtonWidget(
-              textColor: secondary,
-              color: Colors.white,
+              textColor: Colors.white,
+              color: secondary,
               label: 'Get Started',
               onPressed: () {
                 Navigator.of(context).pushReplacement(

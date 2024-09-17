@@ -5,6 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:zippy/screens/pages/profile_page.dart';
 import 'package:zippy/screens/pages/search_page.dart';
 import 'package:zippy/utils/colors.dart';
+import 'package:zippy/widgets/button_widget.dart';
 import 'package:zippy/widgets/text_widget.dart';
 
 import 'pages/shop_page.dart';
@@ -39,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Container(
             width: double.infinity,
-            height: 265,
+            height: 190,
             decoration: const BoxDecoration(
               color: secondary,
               borderRadius: BorderRadius.only(
@@ -60,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         TextWidget(
-                          text: 'Hi! Paula, Welcome Back!',
+                          text: 'Good day! Rider Robert',
                           fontSize: 22,
                           fontFamily: 'Bold',
                           color: Colors.white,
@@ -89,54 +90,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                                builder: (context) => const SearchPage()),
-                          );
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(5.0),
-                          ),
-                          child: const Row(
-                            children: [
-                              Icon(Icons.search, color: Colors.black54),
-                              SizedBox(width: 8.0),
-                              Expanded(
-                                child: TextField(
-                                  enabled: false,
-                                  decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: 'What are you craving today?',
-                                      hintStyle: TextStyle(
-                                        fontFamily: 'Regular',
-                                        fontSize: 14,
-                                        color: Colors.black,
-                                      )),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20.0),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
+                          _buildCravingOption(Icons.home, 'Home', true),
                           _buildCravingOption(
-                              Icons.fastfood_outlined, 'Food', true),
-                          _buildCravingOption(
-                              Icons.directions_car_filled_outlined,
-                              'Ride',
-                              false),
-                          _buildCravingOption(
-                              Icons.card_giftcard, 'Surprise', false),
-                          _buildCravingOption(
-                              Icons.local_shipping_outlined, 'Package', false),
+                              Icons.add_chart_rounded, 'Sales', false),
+                          _buildCravingOption(Icons.history, 'History', false),
                         ],
                       ),
                     ],
@@ -145,117 +105,29 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 30, left: 25, right: 25),
-            child: Align(
-              alignment: Alignment.bottomLeft,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    height: 30,
-                    width: 100,
-                    decoration: BoxDecoration(
-                      color: secondary,
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    child: Center(
-                      child: TextWidget(
-                        text: 'Featured',
-                        fontSize: 15,
-                        color: Colors.white,
-                      ),
-                    ),
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: Container(
+              height: 90,
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(
+                    20,
                   ),
-                  const SizedBox(
-                    height: 10,
+                  topRight: Radius.circular(
+                    20,
                   ),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        for (int i = 0; i < 5; i++)
-                          Padding(
-                            padding: const EdgeInsets.only(right: 10),
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                      builder: (context) => const ShopPage()),
-                                );
-                              },
-                              child: Container(
-                                width: 265,
-                                height: 86,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(
-                                    15,
-                                  ),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 15, right: 15),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        width: 64,
-                                        height: 60,
-                                        decoration: const BoxDecoration(
-                                          image: DecorationImage(
-                                            fit: BoxFit.cover,
-                                            image: AssetImage(
-                                              'assets/images/Rectangle 2.png',
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        width: 15,
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          TextWidget(
-                                            text: 'Bluebird Coffee',
-                                            fontSize: 20,
-                                            fontFamily: 'Bold',
-                                          ),
-                                          Row(
-                                            children: [
-                                              const Icon(
-                                                Icons.location_on_sharp,
-                                                color: secondary,
-                                                size: 15,
-                                              ),
-                                              TextWidget(
-                                                text: '10 mtr Left',
-                                                fontSize: 12,
-                                                fontFamily: 'Medium',
-                                                color: Colors.grey,
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
+                ),
+                color: Colors.white,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: ButtonWidget(
+                  color: secondary,
+                  label: 'Search Bookings',
+                  onPressed: () {},
+                ),
               ),
             ),
           ),

@@ -14,6 +14,7 @@ class TextFieldWidget extends StatefulWidget {
   late bool? showEye;
   late bool? enabled;
   late Color? color;
+  late Color? labelcolor;
   late Color? borderColor;
   late Color? hintColor;
   late double? radius;
@@ -44,6 +45,7 @@ class TextFieldWidget extends StatefulWidget {
     this.borderColor = Colors.transparent,
     this.showEye = false,
     this.enabled = true,
+    this.labelcolor = Colors.white,
     this.color = Colors.black,
     this.radius = 100,
     this.hasValidator = true,
@@ -67,10 +69,8 @@ class _TextFieldWidgetState extends State<TextFieldWidget> {
         child: TextFormField(
           maxLength: widget.length,
           enabled: widget.enabled,
-          style: const TextStyle(
-            fontFamily: 'Medium',
-            fontSize: 24,
-          ),
+          style: TextStyle(
+              fontFamily: 'Medium', fontSize: 24, color: widget.labelcolor),
           textCapitalization: widget.textCapitalization!,
           keyboardType: widget.inputType,
           decoration: InputDecoration(
@@ -98,7 +98,7 @@ class _TextFieldWidgetState extends State<TextFieldWidget> {
             label: TextWidget(
               text: widget.label,
               fontSize: 18,
-              color: secondary,
+              color: widget.labelcolor,
             ),
             hintStyle: const TextStyle(
               fontFamily: 'Regular',
