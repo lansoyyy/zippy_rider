@@ -2,13 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:zippy/screens/pages/profile_page.dart';
-import 'package:zippy/screens/pages/search_page.dart';
+import 'package:zippy/screens/pages/arrived_page.dart';
+
 import 'package:zippy/utils/colors.dart';
 import 'package:zippy/widgets/button_widget.dart';
 import 'package:zippy/widgets/text_widget.dart';
-
-import 'pages/shop_page.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -68,10 +66,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (context) => const ProfilePage()),
-                            );
+                            // Navigator.of(context).push(
+                            //   MaterialPageRoute(
+                            //       builder: (context) => const ProfilePage()),
+                            // );
                           },
                           child: const CircleAvatar(
                             maxRadius: 25,
@@ -126,7 +124,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: ButtonWidget(
                   color: secondary,
                   label: 'Search Bookings',
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (context) => const ArrivedPage()),
+                    );
+                  },
                 ),
               ),
             ),
