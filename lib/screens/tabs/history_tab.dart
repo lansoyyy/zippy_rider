@@ -2,20 +2,21 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:zippy/screens/home_screen.dart';
 import 'package:zippy/screens/pages/arrived_page.dart';
+import 'package:zippy/screens/pages/completed_page.dart';
 import 'package:zippy/screens/pages/profile_page.dart';
-import 'package:zippy/screens/tabs/history_tab.dart';
 import 'package:zippy/screens/tabs/sales_tab.dart';
 
 import 'package:zippy/utils/colors.dart';
 import 'package:zippy/widgets/button_widget.dart';
 import 'package:zippy/widgets/text_widget.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class HistoryScreen extends StatefulWidget {
+  const HistoryScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<HistoryScreen> createState() => _HistoryScreenState();
 
   static const CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(37.42796133580664, -122.085749655962),
@@ -23,22 +24,12 @@ class HomeScreen extends StatefulWidget {
   );
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HistoryScreenState extends State<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
+      body: Column(
         children: [
-          Expanded(
-            child: GoogleMap(
-              zoomControlsEnabled: false,
-              mapType: MapType.normal,
-              initialCameraPosition: HomeScreen._kGooglePlex,
-              onMapCreated: (GoogleMapController controller) {
-                _controller.complete(controller);
-              },
-            ),
-          ),
           Container(
             width: double.infinity,
             height: 190,
@@ -95,9 +86,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                      builder: (context) => const HomeScreen()),
+                                );
+                              },
                               child: _buildCravingOption(
-                                  Icons.home, 'Home', true)),
+                                  Icons.home, 'Home', false)),
                           GestureDetector(
                             onTap: () {
                               Navigator.of(context).pushReplacement(
@@ -109,15 +105,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Icons.add_chart_rounded, 'Sales', false),
                           ),
                           GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const HistoryScreen()),
-                                );
-                              },
+                              onTap: () {},
                               child: _buildCravingOption(
-                                  Icons.history, 'History', false)),
+                                  Icons.history, 'History', true)),
                         ],
                       ),
                     ],
@@ -126,33 +116,90 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          Align(
-            alignment: Alignment.bottomLeft,
-            child: Container(
-              height: 90,
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(
-                    20,
-                  ),
-                  topRight: Radius.circular(
-                    20,
+          const SizedBox(
+            height: 20,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 20, right: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ButtonWidget(
+                  height: 35,
+                  width: 75,
+                  fontSize: 14,
+                  label: 'Food',
+                  onPressed: () {},
+                ),
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.info,
+                    color: secondary,
                   ),
                 ),
-                color: Colors.white,
+              ],
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const CompletedPage()),
+              );
+            },
+            child: Container(
+              height: 125,
+              width: 320,
+              decoration: BoxDecoration(
+                border: Border.all(color: secondary),
+                borderRadius: BorderRadius.circular(
+                  10,
+                ),
               ),
               child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: ButtonWidget(
-                  color: secondary,
-                  label: 'Search Bookings',
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                          builder: (context) => const ArrivedPage()),
-                    );
-                  },
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextWidget(
+                          text: 'Bluebird Coffee',
+                          fontSize: 24,
+                          fontFamily: 'Bold',
+                          color: secondary,
+                        ),
+                        TextWidget(
+                          text: '₱570.00',
+                          fontSize: 16,
+                          fontFamily: 'Medium',
+                          color: Colors.black,
+                        ),
+                      ],
+                    ),
+                    TextWidget(
+                      text: 'Food Delivery',
+                      fontSize: 16,
+                      fontFamily: 'Medium',
+                      color: secondary,
+                    ),
+                    TextWidget(
+                      text: '111 2222 3333 444',
+                      fontSize: 16,
+                      fontFamily: 'Medium',
+                      color: Colors.black,
+                    ),
+                    TextWidget(
+                      text: 'Completed on 13/08/24 at 4:50PM ',
+                      fontSize: 12,
+                      fontFamily: 'Medium',
+                      color: Colors.black,
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -161,9 +208,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-  final Completer<GoogleMapController> _controller =
-      Completer<GoogleMapController>();
 
   Widget _buildCravingOption(IconData icon, String label, bool selected) {
     return Column(
