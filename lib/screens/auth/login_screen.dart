@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:zippy/screens/auth/signup_screen.dart';
 import 'package:zippy/screens/home_screen.dart';
@@ -6,6 +7,7 @@ import 'package:zippy/utils/colors.dart';
 import 'package:zippy/widgets/button_widget.dart';
 import 'package:zippy/widgets/text_widget.dart';
 import 'package:zippy/widgets/textfield_widget.dart';
+import 'package:zippy/widgets/toast_widget.dart';
 
 import '../../utils/const.dart';
 
@@ -127,17 +129,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     fontSize: 20,
                     label: 'Log in',
                     onPressed: () {
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                            builder: (context) => const InitialHomeScreen()),
-                      );
+                      login(context);
                     },
                   ),
                   const SizedBox(
                     height: 20,
                   ),
                   TextWidget(
-                    text: 'Want to become a Merchant?',
+                    text: 'Want to become a Rider?',
                     fontSize: 14,
                     color: Colors.white,
                     fontFamily: 'Medium',
@@ -164,5 +163,30 @@ class _LoginScreenState extends State<LoginScreen> {
         ],
       ),
     );
+  }
+
+  login(context) async {
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: '${number.text}@zippy.rider', password: otp.text);
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const InitialHomeScreen()),
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        showToast("No merchant found with that id.");
+      } else if (e.code == 'wrong-password') {
+        showToast("Wrong password provided for that merchant.");
+      } else if (e.code == 'invalid-email') {
+        showToast("Invalid merchant id provided.");
+      } else if (e.code == 'user-disabled') {
+        showToast("merchant account has been disabled.");
+      } else {
+        showToast("An error occurred: ${e.message}");
+      }
+    } on Exception catch (e) {
+      showToast("An error occurred: $e");
+    }
   }
 }
