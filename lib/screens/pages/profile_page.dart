@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:zippy/utils/const.dart';
@@ -6,8 +8,61 @@ import 'package:zippy/widgets/button_widget.dart';
 import '../../utils/colors.dart';
 import '../../widgets/text_widget.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  String? address;
+  String? bday;
+  String? email;
+  String? expiry;
+  String? licenseNumber;
+  String? name;
+  String? number;
+  String? plateNumber;
+  String? registrationNumber;
+  String? type;
+  String? vehicleModel;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserData();
+  }
+
+  Future<void> fetchUserData() async {
+    try {
+      User? user = _auth.currentUser;
+
+      if (user != null) {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('Riders')
+            .doc(user.uid)
+            .get();
+
+        if (userDoc.exists) {
+          setState(() {
+            address = userDoc.get('address');
+            expiry = userDoc.get('expiry');
+            bday = userDoc.get('bday');
+            email = userDoc.get('email');
+            licenseNumber = userDoc.get('licenseNumber');
+            name = userDoc.get('name');
+            number = userDoc.get('number');
+            plateNumber = userDoc.get('plateNumber');
+            registrationNumber = userDoc.get('registrationNumber');
+          });
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +165,7 @@ class ProfilePage extends StatelessWidget {
             ),
             Center(
               child: TextWidget(
-                text: 'Paula Baresco',
+                text: name ?? 'Loading...',
                 fontSize: 28,
                 color: secondary,
                 fontFamily: 'Bold',
@@ -181,7 +236,7 @@ class ProfilePage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   TextWidget(
-                    text: 'Paula.baresco@gmail.com',
+                    text: email ?? 'Loading...',
                     fontSize: 14,
                     color: secondary,
                     fontFamily: 'Medium',
@@ -190,7 +245,7 @@ class ProfilePage extends StatelessWidget {
                     width: 25,
                   ),
                   TextWidget(
-                    text: '+6399 9999 9999',
+                    text: number ?? 'Loading...',
                     fontSize: 14,
                     color: secondary,
                     fontFamily: 'Medium',
@@ -216,7 +271,7 @@ class ProfilePage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(left: 30, right: 30),
               child: TextWidget(
-                text: 'January 01, 2000',
+                text: bday ?? 'Loading...',
                 fontSize: 14,
                 color: secondary,
                 fontFamily: 'Medium',
@@ -244,7 +299,7 @@ class ProfilePage extends StatelessWidget {
                         fontFamily: 'Regular',
                       ),
                       TextWidget(
-                        text: '999 Home Street, House Avenue ',
+                        text: address ?? 'Loading...',
                         fontSize: 14,
                         color: secondary,
                         fontFamily: 'Medium',
@@ -276,7 +331,7 @@ class ProfilePage extends StatelessWidget {
                         fontFamily: 'Regular',
                       ),
                       TextWidget(
-                        text: 'Red Toyota Vios',
+                        text: vehicleModel ?? 'Loading...',
                         fontSize: 14,
                         color: secondary,
                         fontFamily: 'Medium',
@@ -309,7 +364,7 @@ class ProfilePage extends StatelessWidget {
                       SizedBox(
                         child: TextWidget(
                           align: TextAlign.start,
-                          text: 'A1B2C3',
+                          text: plateNumber ?? 'Loading...',
                           fontSize: 14,
                           color: secondary,
                           fontFamily: 'Medium',
@@ -329,7 +384,7 @@ class ProfilePage extends StatelessWidget {
                       SizedBox(
                         child: TextWidget(
                           align: TextAlign.start,
-                          text: '99988877-6',
+                          text: registrationNumber ?? 'Loading...',
                           fontSize: 14,
                           color: secondary,
                           fontFamily: 'Medium',
@@ -363,7 +418,7 @@ class ProfilePage extends StatelessWidget {
                       SizedBox(
                         child: TextWidget(
                           align: TextAlign.start,
-                          text: 'C10-12-123456',
+                          text: licenseNumber ?? 'Loading...',
                           fontSize: 14,
                           color: secondary,
                           fontFamily: 'Medium',
@@ -383,7 +438,7 @@ class ProfilePage extends StatelessWidget {
                       SizedBox(
                         child: TextWidget(
                           align: TextAlign.start,
-                          text: '2026/01/01',
+                          text: expiry ?? 'Loading...',
                           fontSize: 14,
                           color: secondary,
                           fontFamily: 'Medium',
