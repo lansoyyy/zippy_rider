@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:zippy/screens/home_screen.dart';
-import 'package:zippy/screens/pages/arrived_page.dart';
 import 'package:zippy/screens/pages/completed_page.dart';
 import 'package:zippy/screens/pages/profile_page.dart';
 import 'package:zippy/screens/tabs/sales_tab.dart';
@@ -29,7 +28,7 @@ class HistoryScreen extends StatefulWidget {
 class _HistoryScreenState extends State<HistoryScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String? riderName;
-
+  String? profileImage;
   @override
   void initState() {
     super.initState();
@@ -49,6 +48,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         if (userDoc.exists) {
           setState(() {
             riderName = userDoc.get('name');
+            profileImage = userDoc.get('profileImage');
           });
         }
       }
@@ -97,12 +97,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                   builder: (context) => const ProfilePage()),
                             );
                           },
-                          child: const CircleAvatar(
+                          child: CircleAvatar(
                             maxRadius: 25,
                             minRadius: 25,
-                            backgroundImage: AssetImage(
-                              'assets/images/sample_avatar.png',
-                            ),
+                            backgroundImage: profileImage != null
+                                ? NetworkImage(profileImage!)
+                                : null,
                           ),
                         ),
                       ],

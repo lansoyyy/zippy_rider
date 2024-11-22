@@ -1,14 +1,16 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:zippy/screens/pages/arrived_page.dart';
 import 'package:zippy/screens/pages/profile_page.dart';
 import 'package:zippy/screens/tabs/history_tab.dart';
 import 'package:zippy/screens/tabs/sales_tab.dart';
-
+import 'package:image_picker/image_picker.dart';
 import 'package:zippy/utils/colors.dart';
 import 'package:zippy/widgets/button_widget.dart';
 import 'package:zippy/widgets/text_widget.dart';
@@ -28,6 +30,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String? riderName;
+  File? _image;
+  String? profileImage;
 
   @override
   void initState() {
@@ -48,11 +52,45 @@ class _HomeScreenState extends State<HomeScreen> {
         if (userDoc.exists) {
           setState(() {
             riderName = userDoc.get('name');
+            profileImage = userDoc.get('profileImage');
           });
         }
       }
     } catch (e) {
       print(e);
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+
+      try {
+        User? user = _auth.currentUser;
+
+        if (user != null) {
+          final ref = FirebaseStorage.instance
+              .ref()
+              .child('profile_images')
+              .child('${user.uid}.jpg');
+
+          await ref.putFile(_image!);
+
+          final url = await ref.getDownloadURL();
+
+          await FirebaseFirestore.instance
+              .collection('Riders')
+              .doc(user.uid)
+              .update({'profileImage': url});
+        }
+      } catch (e) {
+        print(e);
+      }
     }
   }
 
@@ -106,12 +144,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                   builder: (context) => const ProfilePage()),
                             );
                           },
-                          child: const CircleAvatar(
+                          child: CircleAvatar(
                             maxRadius: 25,
                             minRadius: 25,
-                            backgroundImage: AssetImage(
-                              'assets/images/sample_avatar.png',
-                            ),
+                            backgroundImage: profileImage != null
+                                ? NetworkImage(profileImage!)
+                                : null,
                           ),
                         ),
                       ],

@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:zippy/utils/const.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:zippy/screens/auth/login_screen.dart';
 import 'package:zippy/widgets/button_widget.dart';
+import 'package:zippy/widgets/toast_widget.dart';
 
 import '../../utils/colors.dart';
 import '../../widgets/text_widget.dart';
@@ -28,6 +32,8 @@ class _ProfilePageState extends State<ProfilePage> {
   String? registrationNumber;
   String? type;
   String? vehicleModel;
+  File? _image;
+  String? profileImage;
 
   @override
   void initState() {
@@ -56,11 +62,48 @@ class _ProfilePageState extends State<ProfilePage> {
             number = userDoc.get('number');
             plateNumber = userDoc.get('plateNumber');
             registrationNumber = userDoc.get('registrationNumber');
+            vehicleModel = userDoc.get('vehicleModel');
+            profileImage = userDoc.get('profileImage');
           });
         }
       }
     } catch (e) {
       print(e);
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+
+      try {
+        User? user = _auth.currentUser;
+
+        if (user != null) {
+          final ref = FirebaseStorage.instance
+              .ref()
+              .child('profile_images')
+              .child('${user.uid}.jpg');
+
+          await ref.putFile(_image!);
+
+          final url = await ref.getDownloadURL();
+
+          await FirebaseFirestore.instance
+              .collection('Riders')
+              .doc(user.uid)
+              .update({'profileImage': url});
+
+          showToast('Profile Image Updated');
+        }
+      } catch (e) {
+        print(e);
+      }
     }
   }
 
@@ -112,9 +155,17 @@ class _ProfilePageState extends State<ProfilePage> {
                         const SizedBox(
                           width: 10,
                         ),
-                        const Icon(
-                          Icons.logout,
-                          color: secondary,
+                        GestureDetector(
+                          onTap: () async {
+                            await FirebaseAuth.instance.signOut();
+                            Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                    builder: (context) => const LoginScreen()));
+                          },
+                          child: const Icon(
+                            Icons.logout,
+                            color: secondary,
+                          ),
                         ),
                       ],
                     ),
@@ -135,14 +186,14 @@ class _ProfilePageState extends State<ProfilePage> {
                         color: secondary,
                       ),
                     ),
-                    child: const Padding(
-                      padding: EdgeInsets.all(5.0),
+                    child: Padding(
+                      padding: const EdgeInsets.all(5.0),
                       child: CircleAvatar(
                         minRadius: 75,
                         maxRadius: 75,
-                        backgroundImage: AssetImage(
-                          'assets/images/sample_avatar.png',
-                        ),
+                        backgroundImage: profileImage != null
+                            ? NetworkImage(profileImage!)
+                            : null,
                       ),
                     ),
                   ),
@@ -154,9 +205,15 @@ class _ProfilePageState extends State<ProfilePage> {
                       height: 40,
                       decoration: const BoxDecoration(
                           shape: BoxShape.circle, color: secondary),
-                      child: const Icon(
-                        Icons.camera_alt_rounded,
-                        color: Colors.white,
+                      child: IconButton(
+                        onPressed: () {
+                          _pickImage();
+                          setState(() {});
+                        },
+                        icon: Icon(
+                          Icons.add_a_photo_rounded,
+                          color: white,
+                        ),
                       ),
                     ),
                   ),

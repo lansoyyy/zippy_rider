@@ -28,6 +28,7 @@ class SalesTab extends StatefulWidget {
 class _SalesTabState extends State<SalesTab> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String? riderName;
+  String? profileImage;
 
   @override
   void initState() {
@@ -48,6 +49,7 @@ class _SalesTabState extends State<SalesTab> {
         if (userDoc.exists) {
           setState(() {
             riderName = userDoc.get('name');
+            profileImage = userDoc.get('profileImage');
           });
         }
       }
@@ -98,12 +100,12 @@ class _SalesTabState extends State<SalesTab> {
                                     builder: (context) => const ProfilePage()),
                               );
                             },
-                            child: const CircleAvatar(
+                            child: CircleAvatar(
                               maxRadius: 25,
                               minRadius: 25,
-                              backgroundImage: AssetImage(
-                                'assets/images/sample_avatar.png',
-                              ),
+                              backgroundImage: profileImage != null
+                                  ? NetworkImage(profileImage!)
+                                  : null,
                             ),
                           ),
                         ],

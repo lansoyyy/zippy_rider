@@ -1,9 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:zippy/firebase_options.dart';
-import 'package:zippy/screens/auth/landing_screen.dart';
-import 'package:zippy/screens/home_screen.dart';
-import 'package:zippy/screens/onboarding_screens/onboarding_one.dart';
 import 'package:zippy/screens/splash_screen.dart';
 
 void main() async {

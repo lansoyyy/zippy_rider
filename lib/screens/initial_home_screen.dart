@@ -1,11 +1,48 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:zippy/screens/home_screen.dart';
 import 'package:zippy/utils/colors.dart';
 import 'package:zippy/utils/const.dart';
 import 'package:zippy/widgets/text_widget.dart';
 
-class InitialHomeScreen extends StatelessWidget {
+class InitialHomeScreen extends StatefulWidget {
   const InitialHomeScreen({super.key});
+
+  @override
+  State<InitialHomeScreen> createState() => _InitialHomeScreenState();
+}
+
+class _InitialHomeScreenState extends State<InitialHomeScreen> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  String? riderName;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserData();
+  }
+
+  Future<void> fetchUserData() async {
+    try {
+      User? user = _auth.currentUser;
+
+      if (user != null) {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('Riders')
+            .doc(user.uid)
+            .get();
+
+        if (userDoc.exists) {
+          setState(() {
+            riderName = userDoc.get('name');
+          });
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +91,7 @@ class InitialHomeScreen extends StatelessWidget {
                         fontFamily: 'Medium',
                         maxLines: 5,
                         text:
-                            'Hi! Rider Robert. Ready to start your Zippy journey?',
+                            'Hi! Rider $riderName. Ready to start your Zippy journey?',
                         fontSize: 16),
                   ),
                 ),
