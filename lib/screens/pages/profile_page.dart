@@ -21,19 +21,21 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  String? address;
-  String? bday;
-  String? email;
-  String? expiry;
-  String? licenseNumber;
-  String? name;
-  String? number;
-  String? plateNumber;
-  String? registrationNumber;
-  String? type;
-  String? vehicleModel;
   File? _image;
   String? profileImage;
+  Map<String, dynamic>? userData;
+  bool isNameEditing = false;
+  bool isNumEditing = false;
+  bool isEmailEditing = false;
+  bool isBdayEditing = false;
+  bool isAddEditing = false;
+  bool isVehEditing = false;
+  TextEditingController nameController = TextEditingController();
+  TextEditingController numberController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController bdayController = TextEditingController();
+  TextEditingController addController = TextEditingController();
+  TextEditingController vehController = TextEditingController();
 
   @override
   void initState() {
@@ -44,33 +46,147 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> fetchUserData() async {
     try {
       User? user = _auth.currentUser;
+      DocumentReference userDoc =
+          FirebaseFirestore.instance.collection('Riders').doc(user?.uid);
 
-      if (user != null) {
-        DocumentSnapshot userDoc = await FirebaseFirestore.instance
-            .collection('Riders')
-            .doc(user.uid)
-            .get();
+      DocumentSnapshot docSnapshot = await userDoc.get();
 
-        if (userDoc.exists) {
-          setState(() {
-            address = userDoc.get('address');
-            expiry = userDoc.get('expiry');
-            bday = userDoc.get('bday');
-            email = userDoc.get('email');
-            licenseNumber = userDoc.get('licenseNumber');
-            name = userDoc.get('name');
-            number = userDoc.get('number');
-            plateNumber = userDoc.get('plateNumber');
-            registrationNumber = userDoc.get('registrationNumber');
-            vehicleModel = userDoc.get('vehicleModel');
-            profileImage = userDoc.get('profileImage');
-          });
-        }
+      if (docSnapshot.exists) {
+        final data = docSnapshot.data() as Map<String, dynamic>;
+        setState(() {
+          userData = data;
+          profileImage = data['profileImage'];
+        });
+      } else {
+        showToast('User data not found.');
       }
     } catch (e) {
-      print(e);
+      print("Error fetching user data: $e");
     }
   }
+
+  Future<void> updateName() async {
+    try {
+      User? user = _auth.currentUser;
+
+      await FirebaseFirestore.instance
+          .collection('Riders')
+          .doc(user?.uid)
+          .update({'name': nameController.text});
+      setState(() {
+        userData!['name'] = nameController.text;
+        isNameEditing = false;
+      });
+    } catch (e) {}
+  }
+
+  Future<void> updateEmail() async {
+    try {
+      User? user = _auth.currentUser;
+
+      await FirebaseFirestore.instance
+          .collection('Riders')
+          .doc(user?.uid)
+          .update({'email': emailController.text});
+      setState(() {
+        userData!['email'] = emailController.text;
+        isEmailEditing = false;
+      });
+    } catch (e) {}
+  }
+
+  Future<void> updateNumber() async {
+    try {
+      User? user = _auth.currentUser;
+
+      await FirebaseFirestore.instance
+          .collection('Riders')
+          .doc(user?.uid)
+          .update({'number': numberController.text});
+      setState(() {
+        userData!['number'] = numberController.text;
+        isNumEditing = false;
+      });
+    } catch (e) {}
+  }
+
+  Future<void> updateBday() async {
+    try {
+      User? user = _auth.currentUser;
+
+      await FirebaseFirestore.instance
+          .collection('Riders')
+          .doc(user?.uid)
+          .update({'bday': bdayController.text});
+      setState(() {
+        userData!['bday'] = bdayController.text;
+        isBdayEditing = false;
+      });
+    } catch (e) {}
+  }
+
+  Future<void> updateAdd() async {
+    try {
+      User? user = _auth.currentUser;
+
+      await FirebaseFirestore.instance
+          .collection('Riders')
+          .doc(user?.uid)
+          .update({'address': addController.text});
+      setState(() {
+        userData!['address'] = addController.text;
+        isAddEditing = false;
+      });
+    } catch (e) {}
+  }
+
+  Future<void> updateVeh() async {
+    try {
+      User? user = _auth.currentUser;
+
+      await FirebaseFirestore.instance
+          .collection('Riders')
+          .doc(user?.uid)
+          .update({'vehicleModel': vehController.text});
+      setState(() {
+        userData!['vehicleModel'] = vehController.text;
+        isVehEditing = false;
+      });
+    } catch (e) {}
+  }
+
+  // Future<void> fetchUserData() async {
+  //   try {
+  //     User? user = _auth.currentUser;
+
+  //     if (user != null) {
+  //       DocumentSnapshot userDoc = await FirebaseFirestore.instance
+  //           .collection('Riders')
+  //           .doc(user.uid)
+  //           .get();
+
+  //       if (userDoc.exists) {
+  //         final data = docSnapshot.data() as Map<String, dynamic>;
+  //         setState(() {
+  //           userData = data;
+  //           address = userDoc.get('address');
+  //           expiry = userDoc.get('expiry');
+  //           bday = userDoc.get('bday');
+  //           email = userDoc.get('email');
+  //           licenseNumber = userDoc.get('licenseNumber');
+  //           name = userDoc.get('name');
+  //           number = userDoc.get('number');
+  //           plateNumber = userDoc.get('plateNumber');
+  //           registrationNumber = userDoc.get('registrationNumber');
+  //           vehicleModel = userDoc.get('vehicleModel');
+  //           profileImage = userDoc.get('profileImage');
+  //         });
+  //       }
+  //     }
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
 
   Future<void> _pickImage() async {
     final pickedFile =
@@ -221,12 +337,58 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
             Center(
-              child: TextWidget(
-                text: name ?? 'Loading...',
-                fontSize: 28,
-                color: secondary,
-                fontFamily: 'Bold',
-              ),
+              child: isNameEditing
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 200,
+                          child: TextField(
+                            decoration:
+                                const InputDecoration(border: InputBorder.none),
+                            controller: nameController,
+                            style: const TextStyle(
+                              color: secondary,
+                              fontSize: 28,
+                              fontFamily: 'Bold',
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.check, color: Colors.green),
+                          onPressed: updateName, // Confirm update
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.cancel, color: Colors.red),
+                          onPressed: () {
+                            setState(() {
+                              isNameEditing = false;
+                              nameController.text =
+                                  userData!['name']; // Revert changes
+                            });
+                          },
+                        ),
+                      ],
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextWidget(
+                          text: '${userData?['name']}' ?? '....',
+                          fontSize: 28,
+                          color: secondary,
+                          fontFamily: 'Bold',
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.edit, color: secondary),
+                          onPressed: () {
+                            setState(() {
+                              isNameEditing = true;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
             ),
             const SizedBox(
               height: 10,
@@ -250,11 +412,28 @@ class _ProfilePageState extends State<ProfilePage> {
                         color: Colors.white,
                         fontFamily: 'Medium',
                       ),
-                      TextWidget(
-                        text: 'Edit',
-                        fontSize: 14,
-                        color: Colors.white,
-                        fontFamily: 'Medium',
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isNumEditing = true;
+                            isEmailEditing = true;
+                            isBdayEditing = true;
+                            isAddEditing = true;
+                            isVehEditing = true;
+                            numberController.text = userData!['number'] ?? '';
+                            emailController.text = userData!['email'] ?? '';
+                            bdayController.text = userData!['bday'] ?? '';
+                            addController.text = userData!['address'] ?? '';
+                            vehController.text =
+                                userData!['vehicleModel'] ?? '';
+                          });
+                        },
+                        child: TextWidget(
+                          text: 'Edit',
+                          fontSize: 14,
+                          color: Colors.white,
+                          fontFamily: 'Medium',
+                        ),
                       ),
                     ],
                   ),
@@ -292,21 +471,124 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  TextWidget(
-                    text: email ?? 'Loading...',
-                    fontSize: 14,
-                    color: secondary,
-                    fontFamily: 'Medium',
-                  ),
-                  const SizedBox(
-                    width: 25,
-                  ),
-                  TextWidget(
-                    text: number ?? 'Loading...',
-                    fontSize: 14,
-                    color: secondary,
-                    fontFamily: 'Medium',
-                  ),
+                  isEmailEditing
+                      ? Row(
+                          children: [
+                            SizedBox(
+                              width: 80,
+                              child: TextField(
+                                decoration: const InputDecoration(
+                                    border: InputBorder.none),
+                                controller: emailController,
+                                style: const TextStyle(
+                                  color: secondary,
+                                  fontSize: 12,
+                                  fontFamily: 'Medium',
+                                ),
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.check,
+                                    color: Colors.green,
+                                    size: 20,
+                                  ),
+                                  onPressed:
+                                      updateEmail, // Confirm email update
+                                  padding:
+                                      EdgeInsets.zero, // Remove default padding
+                                  constraints:
+                                      const BoxConstraints(), // Remove default constraints
+                                ),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.cancel,
+                                    color: Colors.red,
+                                    size: 17,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      isEmailEditing = false;
+                                      emailController.text =
+                                          userData!['email']; // Revert changes
+                                    });
+                                  },
+                                  padding:
+                                      EdgeInsets.zero, // Remove default padding
+                                  constraints:
+                                      const BoxConstraints(), // Remove default constraints
+                                ),
+                              ],
+                            ),
+                          ],
+                        )
+                      : Row(
+                          children: [
+                            TextWidget(
+                              text: '${userData?['email']}' ?? '....',
+                              fontSize: 14,
+                              color: secondary,
+                              fontFamily: 'Medium',
+                            ),
+                          ],
+                        ),
+                  isNumEditing
+                      ? const SizedBox(
+                          width: 0,
+                        )
+                      : const SizedBox(
+                          width: 85,
+                        ),
+                  isNumEditing
+                      ? Row(
+                          children: [
+                            SizedBox(
+                              width: 80,
+                              child: TextField(
+                                decoration: const InputDecoration(
+                                    border: InputBorder.none),
+                                controller: numberController,
+                                style: const TextStyle(
+                                  color: secondary,
+                                  fontSize: 14,
+                                  fontFamily: 'Medium',
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.check,
+                                color: Colors.green,
+                                size: 20,
+                              ),
+                              onPressed: updateNumber, // Confirm number update
+                            ),
+                            const Padding(padding: EdgeInsets.zero),
+                            IconButton(
+                              icon: const Icon(Icons.cancel,
+                                  color: Colors.red, size: 17),
+                              onPressed: () {
+                                setState(() {
+                                  isNumEditing = false;
+                                  numberController.text =
+                                      userData!['number']; // Revert changes
+                                });
+                              },
+                            ),
+                          ],
+                        )
+                      : Row(
+                          children: [
+                            TextWidget(
+                              text: '${userData?['number']}' ?? '....',
+                              fontSize: 14,
+                              color: secondary,
+                              fontFamily: 'Medium',
+                            ),
+                          ],
+                        ),
                 ],
               ),
             ),
@@ -327,12 +609,54 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             Padding(
               padding: const EdgeInsets.only(left: 30, right: 30),
-              child: TextWidget(
-                text: bday ?? 'Loading...',
-                fontSize: 14,
-                color: secondary,
-                fontFamily: 'Medium',
-              ),
+              child: isBdayEditing
+                  ? Row(
+                      children: [
+                        SizedBox(
+                          width: 80,
+                          child: TextField(
+                            decoration:
+                                const InputDecoration(border: InputBorder.none),
+                            controller: bdayController,
+                            style: const TextStyle(
+                              color: secondary,
+                              fontSize: 14,
+                              fontFamily: 'Medium',
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.check,
+                            color: Colors.green,
+                            size: 20,
+                          ),
+                          onPressed: updateBday, // Confirm number update
+                        ),
+                        const Padding(padding: EdgeInsets.zero),
+                        IconButton(
+                          icon: const Icon(Icons.cancel,
+                              color: Colors.red, size: 17),
+                          onPressed: () {
+                            setState(() {
+                              isBdayEditing = false;
+                              bdayController.text =
+                                  userData!['bday']; // Revert changes
+                            });
+                          },
+                        ),
+                      ],
+                    )
+                  : Row(
+                      children: [
+                        TextWidget(
+                          text: '${userData?['bday']}' ?? '....',
+                          fontSize: 14,
+                          color: secondary,
+                          fontFamily: 'Medium',
+                        ),
+                      ],
+                    ),
             ),
             const Padding(
               padding: EdgeInsets.only(left: 30, right: 30),
@@ -355,12 +679,55 @@ class _ProfilePageState extends State<ProfilePage> {
                         color: secondary,
                         fontFamily: 'Regular',
                       ),
-                      TextWidget(
-                        text: address ?? 'Loading...',
-                        fontSize: 14,
-                        color: secondary,
-                        fontFamily: 'Medium',
-                      ),
+                      isAddEditing
+                          ? Row(
+                              children: [
+                                SizedBox(
+                                  width: 80,
+                                  child: TextField(
+                                    decoration: const InputDecoration(
+                                        border: InputBorder.none),
+                                    controller: addController,
+                                    style: const TextStyle(
+                                      color: secondary,
+                                      fontSize: 14,
+                                      fontFamily: 'Medium',
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.check,
+                                    color: Colors.green,
+                                    size: 20,
+                                  ),
+                                  onPressed:
+                                      updateBday, // Confirm number update
+                                ),
+                                const Padding(padding: EdgeInsets.zero),
+                                IconButton(
+                                  icon: const Icon(Icons.cancel,
+                                      color: Colors.red, size: 17),
+                                  onPressed: () {
+                                    setState(() {
+                                      isAddEditing = false;
+                                      addController.text = userData![
+                                          'address']; // Revert changes
+                                    });
+                                  },
+                                ),
+                              ],
+                            )
+                          : Row(
+                              children: [
+                                TextWidget(
+                                  text: '${userData?['address']}' ?? '....',
+                                  fontSize: 14,
+                                  color: secondary,
+                                  fontFamily: 'Medium',
+                                ),
+                              ],
+                            ),
                     ],
                   ),
                 ],
@@ -387,12 +754,55 @@ class _ProfilePageState extends State<ProfilePage> {
                         color: secondary,
                         fontFamily: 'Regular',
                       ),
-                      TextWidget(
-                        text: vehicleModel ?? 'Loading...',
-                        fontSize: 14,
-                        color: secondary,
-                        fontFamily: 'Medium',
-                      ),
+                      isVehEditing
+                          ? Row(
+                              children: [
+                                SizedBox(
+                                  width: 80,
+                                  child: TextField(
+                                    decoration: const InputDecoration(
+                                        border: InputBorder.none),
+                                    controller: vehController,
+                                    style: const TextStyle(
+                                      color: secondary,
+                                      fontSize: 14,
+                                      fontFamily: 'Medium',
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.check,
+                                    color: Colors.green,
+                                    size: 20,
+                                  ),
+                                  onPressed: updateVeh, // Confirm number update
+                                ),
+                                const Padding(padding: EdgeInsets.zero),
+                                IconButton(
+                                  icon: const Icon(Icons.cancel,
+                                      color: Colors.red, size: 17),
+                                  onPressed: () {
+                                    setState(() {
+                                      isVehEditing = false;
+                                      vehController.text = userData![
+                                          'vehicleModel']; // Revert changes
+                                    });
+                                  },
+                                ),
+                              ],
+                            )
+                          : Row(
+                              children: [
+                                TextWidget(
+                                  text:
+                                      '${userData?['vehicleModel']}' ?? '....',
+                                  fontSize: 14,
+                                  color: secondary,
+                                  fontFamily: 'Medium',
+                                ),
+                              ],
+                            ),
                     ],
                   ),
                 ],
@@ -421,7 +831,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       SizedBox(
                         child: TextWidget(
                           align: TextAlign.start,
-                          text: plateNumber ?? 'Loading...',
+                          text: '${userData?['plateNumber']}',
                           fontSize: 14,
                           color: secondary,
                           fontFamily: 'Medium',
@@ -441,7 +851,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       SizedBox(
                         child: TextWidget(
                           align: TextAlign.start,
-                          text: registrationNumber ?? 'Loading...',
+                          text: '${userData?['registrationNumber']}',
                           fontSize: 14,
                           color: secondary,
                           fontFamily: 'Medium',
@@ -475,7 +885,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       SizedBox(
                         child: TextWidget(
                           align: TextAlign.start,
-                          text: licenseNumber ?? 'Loading...',
+                          text: '${userData?['licenseNumber']}',
                           fontSize: 14,
                           color: secondary,
                           fontFamily: 'Medium',
@@ -495,7 +905,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       SizedBox(
                         child: TextWidget(
                           align: TextAlign.start,
-                          text: expiry ?? 'Loading...',
+                          text: '${userData?['expiry']}',
                           fontSize: 14,
                           color: secondary,
                           fontFamily: 'Medium',
