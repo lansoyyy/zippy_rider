@@ -15,7 +15,7 @@ class InitialHomeScreen extends StatefulWidget {
 
 class _InitialHomeScreenState extends State<InitialHomeScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  String? riderName;
+  Map<String, dynamic>? userData;
 
   @override
   void initState() {
@@ -34,8 +34,9 @@ class _InitialHomeScreenState extends State<InitialHomeScreen> {
             .get();
 
         if (userDoc.exists) {
+          final data = userDoc.data() as Map<String, dynamic>;
           setState(() {
-            riderName = userDoc.get('name');
+            userData = data;
           });
         }
       }
@@ -91,7 +92,7 @@ class _InitialHomeScreenState extends State<InitialHomeScreen> {
                         fontFamily: 'Medium',
                         maxLines: 5,
                         text:
-                            'Hi! Rider $riderName. Ready to start your Zippy journey?',
+                            'Hi! Rider ${userData?['name'] ?? '...'}. Ready to start your Zippy journey?',
                         fontSize: 16),
                   ),
                 ),

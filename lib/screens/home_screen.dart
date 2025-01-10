@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:zippy/screens/pages/arrived_page.dart';
+import 'package:zippy/screens/pages/completed_page.dart';
 import 'package:zippy/screens/pages/profile_page.dart';
 import 'package:zippy/screens/tabs/history_tab.dart';
 import 'package:zippy/screens/tabs/sales_tab.dart';
@@ -218,10 +219,278 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: secondary,
                   label: 'Search Bookings',
                   onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                          builder: (context) => const ArrivedPage()),
-                    );
+                    showDialog(
+                        barrierDismissible: true,
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: TextWidget(
+                                text: "Order is Ready for Pickup",
+                                fontSize: 22,
+                                fontFamily: "Bold",
+                                color: secondary),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Image.asset(
+                                  'assets/images/Group 121 (2).png',
+                                  height: 200,
+                                ),
+                                const SizedBox(height: 10),
+                                TextWidget(
+                                    text:
+                                        "Tap on Pick-up to \nconfirm receive order",
+                                    fontSize: 18,
+                                    fontFamily: "Medium",
+                                    color: secondary),
+                                const SizedBox(height: 10),
+                                ButtonWidget(
+                                  color: secondary,
+                                  label: 'Pick-up',
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+
+                                    showDialog(
+                                        barrierDismissible: true,
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            title: Row(
+                                              children: [
+                                                TextWidget(
+                                                    text: "Food Delivery",
+                                                    fontSize: 25,
+                                                    fontFamily: "Bold",
+                                                    color: secondary),
+                                              ],
+                                            ),
+                                            content: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    TextWidget(
+                                                        text:
+                                                            "Reference Code: ",
+                                                        fontSize: 18,
+                                                        fontFamily: "Bold",
+                                                        color: black),
+                                                    TextWidget(
+                                                        text: "1234567890",
+                                                        fontSize: 20,
+                                                        fontFamily: "Bold",
+                                                        color: secondary),
+                                                    const Divider(
+                                                      color: secondary,
+                                                    ),
+                                                  ],
+                                                ),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    TextWidget(
+                                                        text: "Shop: ",
+                                                        fontSize: 18,
+                                                        fontFamily: "Bold",
+                                                        color: black),
+                                                    TextWidget(
+                                                        text: "Coffee Shop",
+                                                        fontSize: 20,
+                                                        fontFamily: "Bold",
+                                                        color: secondary),
+                                                    const Divider(
+                                                      color: secondary,
+                                                    ),
+                                                  ],
+                                                ),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    TextWidget(
+                                                        text: "Address: ",
+                                                        fontSize: 18,
+                                                        fontFamily: "Bold",
+                                                        color: black),
+                                                    TextWidget(
+                                                        text:
+                                                            "5th Avenue, 2nd Floor, Burgos st.",
+                                                        fontSize: 20,
+                                                        fontFamily: "Bold",
+                                                        color: secondary),
+                                                    const Divider(
+                                                      color: secondary,
+                                                    ),
+                                                  ],
+                                                ),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Row(
+                                                          children: [
+                                                            TextWidget(
+                                                                text: "Total: ",
+                                                                fontSize: 18,
+                                                                fontFamily:
+                                                                    "Bold",
+                                                                color: black),
+                                                            TextWidget(
+                                                                text:
+                                                                    "₱ 500.00",
+                                                                fontSize: 20,
+                                                                fontFamily:
+                                                                    "Bold",
+                                                                color:
+                                                                    secondary),
+                                                          ],
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            TextWidget(
+                                                                text: "Tip: ",
+                                                                fontSize: 18,
+                                                                fontFamily:
+                                                                    "Bold",
+                                                                color: black),
+                                                            TextWidget(
+                                                                text:
+                                                                    "₱ 500.00",
+                                                                fontSize: 20,
+                                                                fontFamily:
+                                                                    "Bold",
+                                                                color:
+                                                                    secondary),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    const Divider(
+                                                      color: secondary,
+                                                    ),
+                                                  ],
+                                                ),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    TextWidget(
+                                                        text: "Order List: ",
+                                                        fontSize: 18,
+                                                        fontFamily: "Bold",
+                                                        color: secondary),
+                                                    Column(
+                                                      children: [
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            TextWidget(
+                                                                text: "Salad",
+                                                                fontSize: 20,
+                                                                fontFamily:
+                                                                    "Bold",
+                                                                color: black),
+                                                            TextWidget(
+                                                                text:
+                                                                    "₱ 500.00",
+                                                                fontSize: 20,
+                                                                fontFamily:
+                                                                    "Bold",
+                                                                color:
+                                                                    secondary),
+                                                          ],
+                                                        )
+                                                      ],
+                                                    ),
+                                                    const Divider(
+                                                      color: secondary,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                            actions: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Container(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 35,
+                                                        vertical: 10),
+                                                    decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                            color: secondary,
+                                                            width: 1),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10)),
+                                                    child: GestureDetector(
+                                                      onTap: () {
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
+                                                      child: TextWidget(
+                                                        text: 'Cancel',
+                                                        fontSize: 18,
+                                                        color: black,
+                                                        fontFamily: "Medium",
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 35,
+                                                        vertical: 10),
+                                                    decoration: BoxDecoration(
+                                                        color: secondary,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10)),
+                                                    child: GestureDetector(
+                                                      onTap: () {
+                                                        Navigator.of(context)
+                                                            .push(
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  const ArrivedPage()),
+                                                        );
+                                                      },
+                                                      child: TextWidget(
+                                                        text: 'Accept',
+                                                        fontSize: 18,
+                                                        color: white,
+                                                        fontFamily: "Medium",
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          );
+                                        });
+                                  },
+                                ),
+                              ],
+                            ),
+                            actions: const [],
+                          );
+                        });
                   },
                 ),
               ),
