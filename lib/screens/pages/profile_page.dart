@@ -309,7 +309,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         maxRadius: 75,
                         backgroundImage: profileImage != null
                             ? NetworkImage(profileImage!)
-                            : null,
+                            : const AssetImage(
+                                    'assets/images/Group 121 (2).png')
+                                as ImageProvider,
                       ),
                     ),
                   ),
@@ -322,8 +324,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       decoration: const BoxDecoration(
                           shape: BoxShape.circle, color: secondary),
                       child: IconButton(
-                        onPressed: () {
-                          _pickImage();
+                        onPressed: () async {
+                          await _pickImage();
                           setState(() {});
                         },
                         icon: Icon(

@@ -29,6 +29,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  Map<String, dynamic>? userData;
+
   String? riderName;
   File? _image;
   String? profileImage;
@@ -42,22 +44,20 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> fetchUserData() async {
     try {
       User? user = _auth.currentUser;
+      DocumentReference userDoc =
+          FirebaseFirestore.instance.collection('Riders').doc(user?.uid);
 
-      if (user != null) {
-        DocumentSnapshot userDoc = await FirebaseFirestore.instance
-            .collection('Riders')
-            .doc(user.uid)
-            .get();
-
-        if (userDoc.exists) {
+      userDoc.snapshots().listen((docSnapshot) {
+        if (docSnapshot.exists) {
+          final data = docSnapshot.data() as Map<String, dynamic>;
           setState(() {
-            riderName = userDoc.get('name');
-            profileImage = userDoc.get('profileImage');
+            userData = data;
+            profileImage = data['profileImage'];
           });
-        }
-      }
+        } else {}
+      });
     } catch (e) {
-      print(e);
+      print("Error fetching user data: $e");
     }
   }
 
@@ -132,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         TextWidget(
-                          text: 'Good day! Rider $riderName',
+                          text: 'Good Day! Rider ${userData!['name']}',
                           fontSize: 22,
                           fontFamily: 'Bold',
                           color: Colors.white,
