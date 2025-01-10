@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -23,18 +24,22 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 
   static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(37.42796133580664, -122.085749655962),
+    target: LatLng(8.4542, 124.6319),
     zoom: 14.4746,
   );
 }
 
 class _HomeScreenState extends State<HomeScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  Map<String, dynamic>? randomOrder;
   Map<String, dynamic>? userData;
 
   String? riderName;
   File? _image;
   String? profileImage;
+  String? merchantId;
+  int orderCount = 0;
+  double totalEarned = 0.0;
 
   @override
   void initState() {
@@ -55,10 +60,38 @@ class _HomeScreenState extends State<HomeScreen> {
             userData = data;
             profileImage = data['profileImage'];
           });
+          fetchRandomOrder();
         } else {}
       });
     } catch (e) {
       print("Error fetching user data: $e");
+    }
+  }
+
+  Future<void> fetchRandomOrder() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('Orders')
+          .where('status', isEqualTo: 'On the way')
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        final randomIndex = Random().nextInt(querySnapshot.docs.length);
+        final randomDoc = querySnapshot.docs[randomIndex];
+        setState(() {
+          randomOrder = randomDoc.data() as Map<String, dynamic>;
+        });
+      } else {
+        // Handle case where no orders exist
+        setState(() {
+          randomOrder = null;
+        });
+      }
+    } catch (e) {
+      print('Error fetching random order: $e');
+      setState(() {
+        randomOrder = null;
+      });
     }
   }
 
@@ -249,7 +282,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   label: 'Pick-up',
                                   onPressed: () {
                                     Navigator.of(context).pop();
-
+                                    fetchRandomOrder();
                                     showDialog(
                                         barrierDismissible: true,
                                         context: context,
@@ -280,7 +313,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         fontFamily: "Bold",
                                                         color: black),
                                                     TextWidget(
-                                                        text: "1234567890",
+                                                        text:
+                                                            '${randomOrder?['uid'] ?? 'N/A'}',
                                                         fontSize: 20,
                                                         fontFamily: "Bold",
                                                         color: secondary),
@@ -299,7 +333,30 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         fontFamily: "Bold",
                                                         color: black),
                                                     TextWidget(
-                                                        text: "Coffee Shop",
+                                                        text:
+                                                            '${randomOrder?['merchantName'] ?? 'N/A'}',
+                                                        fontSize: 20,
+                                                        fontFamily: "Bold",
+                                                        color: secondary),
+                                                    const Divider(
+                                                      color: secondary,
+                                                    ),
+                                                  ],
+                                                ),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: [
+                                                    TextWidget(
+                                                        text: "Address: ",
+                                                        fontSize: 18,
+                                                        fontFamily: "Bold",
+                                                        color: black),
+                                                    TextWidget(
+                                                        text:
+                                                            '${randomOrder?['deliveryAdd'] ?? 'N/A'}',
                                                         fontSize: 20,
                                                         fontFamily: "Bold",
                                                         color: secondary),
@@ -313,16 +370,87 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       CrossAxisAlignment.start,
                                                   children: [
                                                     TextWidget(
-                                                        text: "Address: ",
-                                                        fontSize: 18,
-                                                        fontFamily: "Bold",
-                                                        color: black),
-                                                    TextWidget(
-                                                        text:
-                                                            "5th Avenue, 2nd Floor, Burgos st.",
-                                                        fontSize: 20,
+                                                        text: "Order List: ",
+                                                        fontSize: 23,
                                                         fontFamily: "Bold",
                                                         color: secondary),
+                                                    Column(
+                                                      children: randomOrder?[
+                                                                  'items'] !=
+                                                              null
+                                                          ? (randomOrder![
+                                                                      'items']
+                                                                  as List<
+                                                                      dynamic>)
+                                                              .fold<
+                                                                      Map<String,
+                                                                          int>>(
+                                                                  {},
+                                                                  (acc, order) {
+                                                                acc.update(
+                                                                    order[
+                                                                        'name'],
+                                                                    (value) =>
+                                                                        value +
+                                                                        1,
+                                                                    ifAbsent:
+                                                                        () =>
+                                                                            1);
+                                                                return acc;
+                                                              })
+                                                              .entries
+                                                              .map((entry) {
+                                                                final order = randomOrder![
+                                                                        'items']
+                                                                    .firstWhere((item) =>
+                                                                        item[
+                                                                            'name'] ==
+                                                                        entry
+                                                                            .key);
+                                                                final totalPrice =
+                                                                    (order['price']
+                                                                            as num) *
+                                                                        entry
+                                                                            .value;
+                                                                return Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .spaceBetween,
+                                                                  children: [
+                                                                    TextWidget(
+                                                                        text:
+                                                                            'x${entry.value} ${entry.key} ',
+                                                                        fontSize:
+                                                                            20,
+                                                                        fontFamily:
+                                                                            "Bold",
+                                                                        color:
+                                                                            black),
+                                                                    TextWidget(
+                                                                        text: totalPrice !=
+                                                                                null
+                                                                            ? '₱ ${totalPrice.toStringAsFixed(2)}'
+                                                                            : 'N/A',
+                                                                        fontSize:
+                                                                            20,
+                                                                        fontFamily:
+                                                                            "Bold",
+                                                                        color:
+                                                                            secondary),
+                                                                  ],
+                                                                );
+                                                              })
+                                                              .toList()
+                                                          : [
+                                                              TextWidget(
+                                                                  text:
+                                                                      'No order details available',
+                                                                  fontSize: 18,
+                                                                  fontFamily:
+                                                                      "Medium",
+                                                                  color: black)
+                                                            ],
+                                                    ),
                                                     const Divider(
                                                       color: secondary,
                                                     ),
@@ -337,85 +465,114 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           MainAxisAlignment
                                                               .spaceBetween,
                                                       children: [
-                                                        Row(
-                                                          children: [
-                                                            TextWidget(
-                                                                text: "Total: ",
-                                                                fontSize: 18,
-                                                                fontFamily:
-                                                                    "Bold",
-                                                                color: black),
-                                                            TextWidget(
-                                                                text:
-                                                                    "₱ 500.00",
-                                                                fontSize: 20,
-                                                                fontFamily:
-                                                                    "Bold",
-                                                                color:
-                                                                    secondary),
-                                                          ],
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            TextWidget(
-                                                                text: "Tip: ",
-                                                                fontSize: 18,
-                                                                fontFamily:
-                                                                    "Bold",
-                                                                color: black),
-                                                            TextWidget(
-                                                                text:
-                                                                    "₱ 500.00",
-                                                                fontSize: 20,
-                                                                fontFamily:
-                                                                    "Bold",
-                                                                color:
-                                                                    secondary),
-                                                          ],
-                                                        ),
+                                                        TextWidget(
+                                                            text: "Payment: ",
+                                                            fontSize: 18,
+                                                            fontFamily: "Bold",
+                                                            color: black),
+                                                        TextWidget(
+                                                            text:
+                                                                '${randomOrder?['mop'] ?? 'N/A'}',
+                                                            fontSize: 20,
+                                                            fontFamily: "Bold",
+                                                            color: secondary),
                                                       ],
                                                     ),
-                                                    const Divider(
-                                                      color: secondary,
-                                                    ),
-                                                  ],
-                                                ),
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    TextWidget(
-                                                        text: "Order List: ",
-                                                        fontSize: 18,
-                                                        fontFamily: "Bold",
-                                                        color: secondary),
-                                                    Column(
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
                                                       children: [
-                                                        Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
-                                                          children: [
-                                                            TextWidget(
-                                                                text: "Salad",
-                                                                fontSize: 20,
-                                                                fontFamily:
-                                                                    "Bold",
-                                                                color: black),
-                                                            TextWidget(
-                                                                text:
-                                                                    "₱ 500.00",
-                                                                fontSize: 20,
-                                                                fontFamily:
-                                                                    "Bold",
-                                                                color:
-                                                                    secondary),
-                                                          ],
-                                                        )
+                                                        TextWidget(
+                                                            text: 'Subtotal: ',
+                                                            fontSize: 20,
+                                                            fontFamily: "Bold",
+                                                            color: black),
+                                                        TextWidget(
+                                                            text: randomOrder?[
+                                                                        'items'] !=
+                                                                    null
+                                                                ? '₱ ${(randomOrder!['items'] as List<dynamic>).fold<num>(0, (sum, item) => sum + (item['price'] as num)).toStringAsFixed(2)}'
+                                                                : 'N/A',
+                                                            fontSize: 20,
+                                                            fontFamily: "Bold",
+                                                            color: secondary),
+                                                      ],
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        TextWidget(
+                                                            text:
+                                                                "Delivery Fee: ",
+                                                            fontSize: 20,
+                                                            fontFamily: "Bold",
+                                                            color: black),
+                                                        TextWidget(
+                                                            text: randomOrder !=
+                                                                        null &&
+                                                                    randomOrder?[
+                                                                            'deliveryFee'] !=
+                                                                        null
+                                                                ? '₱${(randomOrder?['deliveryFee'] as num).toStringAsFixed(2)}'
+                                                                : 'N/A',
+                                                            fontSize: 20,
+                                                            fontFamily: "Bold",
+                                                            color: secondary),
+                                                      ],
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        TextWidget(
+                                                            text: "Tip: ",
+                                                            fontSize: 20,
+                                                            fontFamily: "Bold",
+                                                            color: black),
+                                                        TextWidget(
+                                                            text: randomOrder !=
+                                                                        null &&
+                                                                    randomOrder?[
+                                                                            'tip'] !=
+                                                                        null
+                                                                ? '₱${(randomOrder?['tip'] as num).toStringAsFixed(2)}'
+                                                                : 'N/A',
+                                                            fontSize: 20,
+                                                            fontFamily: "Bold",
+                                                            color: secondary),
                                                       ],
                                                     ),
                                                     const Divider(
                                                       color: secondary,
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        TextWidget(
+                                                            text:
+                                                                "Amount to pay: ",
+                                                            fontSize: 20,
+                                                            fontFamily: "Bold",
+                                                            color: black),
+                                                        TextWidget(
+                                                          text: randomOrder !=
+                                                                      null &&
+                                                                  randomOrder?[
+                                                                          'items'] !=
+                                                                      null
+                                                              ? '₱ ${((randomOrder!['items'] as List<dynamic>).fold<num>(0, (sum, item) => sum + (item['price'] as num)) + (randomOrder?['deliveryFee'] as num? ?? 0) + (randomOrder?['tip'] as num? ?? 0)).toStringAsFixed(2)}'
+                                                              : 'N/A',
+                                                          fontSize: 20,
+                                                          fontFamily: "Bold",
+                                                          color: secondary,
+                                                        ),
+                                                      ],
                                                     ),
                                                   ],
                                                 ),
