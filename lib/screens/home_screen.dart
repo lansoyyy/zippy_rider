@@ -428,7 +428,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                             black),
                                                                     TextWidget(
                                                                         text: totalPrice !=
-                                                                                null
+                                                                                ''
                                                                             ? '₱ ${totalPrice.toStringAsFixed(2)}'
                                                                             : 'N/A',
                                                                         fontSize:
@@ -489,10 +489,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             fontFamily: "Bold",
                                                             color: black),
                                                         TextWidget(
-                                                            text: randomOrder?[
-                                                                        'items'] !=
-                                                                    null
-                                                                ? '₱ ${(randomOrder!['items'] as List<dynamic>).fold<num>(0, (sum, item) => sum + (item['price'] as num)).toStringAsFixed(2)}'
+                                                            text: randomOrder !=
+                                                                        null &&
+                                                                    randomOrder?[
+                                                                            'subtotal'] !=
+                                                                        null
+                                                                ? '₱${(randomOrder?['subtotal'] as num).toStringAsFixed(2)}'
                                                                 : 'N/A',
                                                             fontSize: 20,
                                                             fontFamily: "Bold",
@@ -564,9 +566,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           text: randomOrder !=
                                                                       null &&
                                                                   randomOrder?[
-                                                                          'items'] !=
+                                                                          'total'] !=
                                                                       null
-                                                              ? '₱ ${((randomOrder!['items'] as List<dynamic>).fold<num>(0, (sum, item) => sum + (item['price'] as num)) + (randomOrder?['deliveryFee'] as num? ?? 0) + (randomOrder?['tip'] as num? ?? 0)).toStringAsFixed(2)}'
+                                                              ? '₱${(randomOrder?['total'] as num).toStringAsFixed(2)}'
                                                               : 'N/A',
                                                           fontSize: 20,
                                                           fontFamily: "Bold",
