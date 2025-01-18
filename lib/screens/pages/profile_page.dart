@@ -395,534 +395,570 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(
               height: 10,
             ),
-            Center(
-              child: Container(
-                width: 320,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: secondary,
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 15, right: 15),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      TextWidget(
-                        text: 'Personal Information',
-                        fontSize: 15,
-                        color: Colors.white,
-                        fontFamily: 'Medium',
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            isNumEditing = true;
-                            isEmailEditing = true;
-                            isBdayEditing = true;
-                            isAddEditing = true;
-                            isVehEditing = true;
-                            numberController.text = userData!['number'] ?? '';
-                            emailController.text = userData!['email'] ?? '';
-                            bdayController.text = userData!['bday'] ?? '';
-                            addController.text = userData!['address'] ?? '';
-                            vehController.text =
-                                userData!['vehicleModel'] ?? '';
-                          });
-                        },
-                        child: TextWidget(
-                          text: 'Edit',
-                          fontSize: 14,
-                          color: Colors.white,
-                          fontFamily: 'Medium',
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  TextWidget(
-                    text: 'EMAIL ADDRESS',
-                    fontSize: 10,
+            Stack(
+              children: [
+                Container(
+                  width: double.infinity,
+                  height: MediaQuery.of(context).size.height - 400,
+                  decoration: const BoxDecoration(
                     color: secondary,
-                    fontFamily: 'Regular',
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
                   ),
-                  const SizedBox(
-                    width: 120,
-                  ),
-                  TextWidget(
-                    text: 'MOBILE NUMBER',
-                    fontSize: 10,
-                    color: secondary,
-                    fontFamily: 'Regular',
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  isEmailEditing
-                      ? Row(
-                          children: [
-                            SizedBox(
-                              width: 80,
-                              child: TextField(
-                                decoration: const InputDecoration(
-                                    border: InputBorder.none),
-                                controller: emailController,
-                                style: const TextStyle(
-                                  color: secondary,
-                                  fontSize: 12,
-                                  fontFamily: 'Medium',
-                                ),
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.check,
-                                    color: Colors.green,
-                                    size: 20,
-                                  ),
-                                  onPressed:
-                                      updateEmail, // Confirm email update
-                                  padding:
-                                      EdgeInsets.zero, // Remove default padding
-                                  constraints:
-                                      const BoxConstraints(), // Remove default constraints
-                                ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.cancel,
-                                    color: Colors.red,
-                                    size: 17,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      isEmailEditing = false;
-                                      emailController.text =
-                                          userData!['email']; // Revert changes
-                                    });
-                                  },
-                                  padding:
-                                      EdgeInsets.zero, // Remove default padding
-                                  constraints:
-                                      const BoxConstraints(), // Remove default constraints
-                                ),
-                              ],
-                            ),
-                          ],
-                        )
-                      : Row(
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.only(top: 20, left: 25, right: 25),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             TextWidget(
-                              text: '${userData?['email']}' ?? '....',
-                              fontSize: 14,
-                              color: secondary,
-                              fontFamily: 'Medium',
+                              text: 'Personal Information',
+                              fontSize: 25,
+                              color: Colors.white,
+                              fontFamily: 'Bold',
                             ),
-                          ],
-                        ),
-                  isNumEditing
-                      ? const SizedBox(
-                          width: 0,
-                        )
-                      : const SizedBox(
-                          width: 85,
-                        ),
-                  isNumEditing
-                      ? Row(
-                          children: [
-                            SizedBox(
-                              width: 80,
-                              child: TextField(
-                                decoration: const InputDecoration(
-                                    border: InputBorder.none),
-                                controller: numberController,
-                                style: const TextStyle(
-                                  color: secondary,
-                                  fontSize: 14,
-                                  fontFamily: 'Medium',
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(
-                                Icons.check,
-                                color: Colors.green,
-                                size: 20,
-                              ),
-                              onPressed: updateNumber, // Confirm number update
-                            ),
-                            const Padding(padding: EdgeInsets.zero),
-                            IconButton(
-                              icon: const Icon(Icons.cancel,
-                                  color: Colors.red, size: 17),
-                              onPressed: () {
+                            GestureDetector(
+                              onTap: () {
                                 setState(() {
-                                  isNumEditing = false;
+                                  isNumEditing = true;
+                                  isEmailEditing = true;
+                                  isBdayEditing = true;
+                                  isAddEditing = true;
+                                  isVehEditing = true;
                                   numberController.text =
-                                      userData!['number']; // Revert changes
+                                      userData!['number'] ?? '';
+                                  emailController.text =
+                                      userData!['email'] ?? '';
+                                  bdayController.text = userData!['bday'] ?? '';
+                                  addController.text =
+                                      userData!['address'] ?? '';
+                                  vehController.text =
+                                      userData!['vehicleModel'] ?? '';
                                 });
                               },
+                              child: TextWidget(
+                                text: 'Edit',
+                                fontSize: 25,
+                                color: Colors.white,
+                                fontFamily: 'Medium',
+                              ),
                             ),
                           ],
-                        )
-                      : Row(
-                          children: [
-                            TextWidget(
-                              text: '${userData?['number']}' ?? '....',
-                              fontSize: 14,
-                              color: secondary,
-                              fontFamily: 'Medium',
-                            ),
-                          ],
-                        ),
-                ],
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.only(left: 30, right: 30),
-              child: Divider(
-                color: secondary,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30, right: 30),
-              child: TextWidget(
-                text: 'BIRTHDATE',
-                fontSize: 10,
-                color: secondary,
-                fontFamily: 'Regular',
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30, right: 30),
-              child: isBdayEditing
-                  ? Row(
-                      children: [
-                        SizedBox(
-                          width: 80,
-                          child: TextField(
-                            decoration:
-                                const InputDecoration(border: InputBorder.none),
-                            controller: bdayController,
-                            style: const TextStyle(
-                              color: secondary,
-                              fontSize: 14,
-                              fontFamily: 'Medium',
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.check,
-                            color: Colors.green,
-                            size: 20,
-                          ),
-                          onPressed: updateBday, // Confirm number update
-                        ),
-                        const Padding(padding: EdgeInsets.zero),
-                        IconButton(
-                          icon: const Icon(Icons.cancel,
-                              color: Colors.red, size: 17),
-                          onPressed: () {
-                            setState(() {
-                              isBdayEditing = false;
-                              bdayController.text =
-                                  userData!['bday']; // Revert changes
-                            });
-                          },
-                        ),
-                      ],
-                    )
-                  : Row(
-                      children: [
-                        TextWidget(
-                          text: '${userData?['bday']}' ?? '....',
-                          fontSize: 14,
-                          color: secondary,
-                          fontFamily: 'Medium',
                         ),
                       ],
                     ),
-            ),
-            const Padding(
-              padding: EdgeInsets.only(left: 30, right: 30),
-              child: Divider(
-                color: secondary,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30, right: 30),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextWidget(
-                        text: 'Address',
-                        fontSize: 10,
-                        color: secondary,
-                        fontFamily: 'Regular',
+                  ),
+                ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  top: 60,
+                  child: Container(
+                    height: MediaQuery.of(context).size.height - 400,
+                    decoration: BoxDecoration(
+                      color: white,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
                       ),
-                      isAddEditing
-                          ? Row(
+                    ),
+                    width: double.infinity,
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 30, top: 30),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              TextWidget(
+                                text: 'EMAIL ADDRESS',
+                                fontSize: 10,
+                                color: secondary,
+                                fontFamily: 'Regular',
+                              ),
+                              const SizedBox(
+                                width: 120,
+                              ),
+                              TextWidget(
+                                text: 'MOBILE NUMBER',
+                                fontSize: 10,
+                                color: secondary,
+                                fontFamily: 'Regular',
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 30),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              isEmailEditing
+                                  ? Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 80,
+                                          child: TextField(
+                                            decoration: const InputDecoration(
+                                                border: InputBorder.none),
+                                            controller: emailController,
+                                            style: const TextStyle(
+                                              color: secondary,
+                                              fontSize: 12,
+                                              fontFamily: 'Medium',
+                                            ),
+                                          ),
+                                        ),
+                                        Row(
+                                          children: [
+                                            IconButton(
+                                              icon: const Icon(
+                                                Icons.check,
+                                                color: Colors.green,
+                                                size: 20,
+                                              ),
+                                              onPressed:
+                                                  updateEmail, // Confirm email update
+                                              padding: EdgeInsets
+                                                  .zero, // Remove default padding
+                                              constraints:
+                                                  const BoxConstraints(), // Remove default constraints
+                                            ),
+                                            IconButton(
+                                              icon: const Icon(
+                                                Icons.cancel,
+                                                color: Colors.red,
+                                                size: 17,
+                                              ),
+                                              onPressed: () {
+                                                setState(() {
+                                                  isEmailEditing = false;
+                                                  emailController.text = userData![
+                                                      'email']; // Revert changes
+                                                });
+                                              },
+                                              padding: EdgeInsets
+                                                  .zero, // Remove default padding
+                                              constraints:
+                                                  const BoxConstraints(), // Remove default constraints
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    )
+                                  : Row(
+                                      children: [
+                                        TextWidget(
+                                          text:
+                                              '${userData?['email']}' ?? '....',
+                                          fontSize: 14,
+                                          color: secondary,
+                                          fontFamily: 'Medium',
+                                        ),
+                                      ],
+                                    ),
+                              isNumEditing
+                                  ? const SizedBox(
+                                      width: 0,
+                                    )
+                                  : const SizedBox(
+                                      width: 85,
+                                    ),
+                              isNumEditing
+                                  ? Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 80,
+                                          child: TextField(
+                                            decoration: const InputDecoration(
+                                                border: InputBorder.none),
+                                            controller: numberController,
+                                            style: const TextStyle(
+                                              color: secondary,
+                                              fontSize: 14,
+                                              fontFamily: 'Medium',
+                                            ),
+                                          ),
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(
+                                            Icons.check,
+                                            color: Colors.green,
+                                            size: 20,
+                                          ),
+                                          onPressed:
+                                              updateNumber, // Confirm number update
+                                        ),
+                                        const Padding(padding: EdgeInsets.zero),
+                                        IconButton(
+                                          icon: const Icon(Icons.cancel,
+                                              color: Colors.red, size: 17),
+                                          onPressed: () {
+                                            setState(() {
+                                              isNumEditing = false;
+                                              numberController.text = userData![
+                                                  'number']; // Revert changes
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                    )
+                                  : Row(
+                                      children: [
+                                        TextWidget(
+                                          text: '${userData?['number']}' ??
+                                              '....',
+                                          fontSize: 14,
+                                          color: secondary,
+                                          fontFamily: 'Medium',
+                                        ),
+                                      ],
+                                    ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                            padding: const EdgeInsets.only(left: 30, right: 30),
+                            child: Divider(color: black)),
+                        Padding(
+                            padding: const EdgeInsets.only(left: 30, right: 30),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                SizedBox(
-                                  width: 80,
-                                  child: TextField(
-                                    decoration: const InputDecoration(
-                                        border: InputBorder.none),
-                                    controller: addController,
-                                    style: const TextStyle(
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TextWidget(
+                                      text: 'BIRTHDATE',
+                                      fontSize: 10,
                                       color: secondary,
+                                      fontFamily: 'Regular',
+                                    ),
+                                    isBdayEditing
+                                        ? Row(
+                                            children: [
+                                              SizedBox(
+                                                width: 80,
+                                                child: TextField(
+                                                  decoration:
+                                                      const InputDecoration(
+                                                          border:
+                                                              InputBorder.none),
+                                                  controller: bdayController,
+                                                  style: const TextStyle(
+                                                    color: secondary,
+                                                    fontSize: 14,
+                                                    fontFamily: 'Medium',
+                                                  ),
+                                                ),
+                                              ),
+                                              IconButton(
+                                                icon: const Icon(
+                                                  Icons.check,
+                                                  color: Colors.green,
+                                                  size: 20,
+                                                ),
+                                                onPressed:
+                                                    updateBday, // Confirm number update
+                                              ),
+                                              const Padding(
+                                                  padding: EdgeInsets.zero),
+                                              IconButton(
+                                                icon: const Icon(Icons.cancel,
+                                                    color: Colors.red,
+                                                    size: 17),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    isBdayEditing = false;
+                                                    bdayController.text = userData![
+                                                        'bday']; // Revert changes
+                                                  });
+                                                },
+                                              ),
+                                            ],
+                                          )
+                                        : Row(
+                                            children: [
+                                              TextWidget(
+                                                text: '${userData?['bday']}' ??
+                                                    '....',
+                                                fontSize: 14,
+                                                color: secondary,
+                                                fontFamily: 'Medium',
+                                              ),
+                                            ],
+                                          ),
+                                  ],
+                                ),
+                              ],
+                            )),
+                        Padding(
+                            padding: const EdgeInsets.only(left: 30, right: 30),
+                            child: Divider(color: black)),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 30, right: 30),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  TextWidget(
+                                    text: 'Address',
+                                    fontSize: 10,
+                                    color: secondary,
+                                    fontFamily: 'Regular',
+                                  ),
+                                  isAddEditing
+                                      ? Row(
+                                          children: [
+                                            SizedBox(
+                                              width: 80,
+                                              child: TextField(
+                                                decoration:
+                                                    const InputDecoration(
+                                                        border:
+                                                            InputBorder.none),
+                                                controller: addController,
+                                                style: const TextStyle(
+                                                  color: secondary,
+                                                  fontSize: 14,
+                                                  fontFamily: 'Medium',
+                                                ),
+                                              ),
+                                            ),
+                                            IconButton(
+                                              icon: const Icon(
+                                                Icons.check,
+                                                color: Colors.green,
+                                                size: 20,
+                                              ),
+                                              onPressed:
+                                                  updateAdd, // Confirm number update
+                                            ),
+                                            const Padding(
+                                                padding: EdgeInsets.zero),
+                                            IconButton(
+                                              icon: const Icon(Icons.cancel,
+                                                  color: Colors.red, size: 17),
+                                              onPressed: () {
+                                                setState(() {
+                                                  isAddEditing = false;
+                                                  addController.text = userData![
+                                                      'address']; // Revert changes
+                                                });
+                                              },
+                                            ),
+                                          ],
+                                        )
+                                      : Row(
+                                          children: [
+                                            TextWidget(
+                                              text: '${userData?['address']}' ??
+                                                  '....',
+                                              fontSize: 14,
+                                              color: secondary,
+                                              fontFamily: 'Medium',
+                                            ),
+                                          ],
+                                        ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                            padding: const EdgeInsets.only(left: 30, right: 30),
+                            child: Divider(color: black)),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 30, right: 30),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  TextWidget(
+                                    text: 'Vehicle Model',
+                                    fontSize: 10,
+                                    color: secondary,
+                                    fontFamily: 'Regular',
+                                  ),
+                                  isVehEditing
+                                      ? Row(
+                                          children: [
+                                            SizedBox(
+                                              width: 80,
+                                              child: TextField(
+                                                decoration:
+                                                    const InputDecoration(
+                                                        border:
+                                                            InputBorder.none),
+                                                controller: vehController,
+                                                style: const TextStyle(
+                                                  color: secondary,
+                                                  fontSize: 14,
+                                                  fontFamily: 'Medium',
+                                                ),
+                                              ),
+                                            ),
+                                            IconButton(
+                                              icon: const Icon(
+                                                Icons.check,
+                                                color: Colors.green,
+                                                size: 20,
+                                              ),
+                                              onPressed:
+                                                  updateVeh, // Confirm number update
+                                            ),
+                                            const Padding(
+                                                padding: EdgeInsets.zero),
+                                            IconButton(
+                                              icon: const Icon(Icons.cancel,
+                                                  color: Colors.red, size: 17),
+                                              onPressed: () {
+                                                setState(() {
+                                                  isVehEditing = false;
+                                                  vehController.text = userData![
+                                                      'vehicleModel']; // Revert changes
+                                                });
+                                              },
+                                            ),
+                                          ],
+                                        )
+                                      : Row(
+                                          children: [
+                                            TextWidget(
+                                              text:
+                                                  '${userData?['vehicleModel']}' ??
+                                                      '....',
+                                              fontSize: 14,
+                                              color: secondary,
+                                              fontFamily: 'Medium',
+                                            ),
+                                          ],
+                                        ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                            padding: const EdgeInsets.only(left: 30, right: 30),
+                            child: Divider(color: black)),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 30, right: 30),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  TextWidget(
+                                    text: 'Plate Number',
+                                    fontSize: 10,
+                                    color: secondary,
+                                    fontFamily: 'Regular',
+                                  ),
+                                  SizedBox(
+                                    child: TextWidget(
+                                      align: TextAlign.start,
+                                      text: '${userData?['plateNumber']}',
                                       fontSize: 14,
+                                      color: secondary,
                                       fontFamily: 'Medium',
                                     ),
                                   ),
-                                ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.check,
-                                    color: Colors.green,
-                                    size: 20,
+                                ],
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  TextWidget(
+                                    text: 'Registration No.',
+                                    fontSize: 10,
+                                    color: secondary,
+                                    fontFamily: 'Regular',
                                   ),
-                                  onPressed:
-                                      updateBday, // Confirm number update
-                                ),
-                                const Padding(padding: EdgeInsets.zero),
-                                IconButton(
-                                  icon: const Icon(Icons.cancel,
-                                      color: Colors.red, size: 17),
-                                  onPressed: () {
-                                    setState(() {
-                                      isAddEditing = false;
-                                      addController.text = userData![
-                                          'address']; // Revert changes
-                                    });
-                                  },
-                                ),
-                              ],
-                            )
-                          : Row(
-                              children: [
-                                TextWidget(
-                                  text: '${userData?['address']}' ?? '....',
-                                  fontSize: 14,
-                                  color: secondary,
-                                  fontFamily: 'Medium',
-                                ),
-                              ],
-                            ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.only(left: 30, right: 30),
-              child: Divider(
-                color: secondary,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30, right: 30),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextWidget(
-                        text: 'Vehicle Model',
-                        fontSize: 10,
-                        color: secondary,
-                        fontFamily: 'Regular',
-                      ),
-                      isVehEditing
-                          ? Row(
-                              children: [
-                                SizedBox(
-                                  width: 80,
-                                  child: TextField(
-                                    decoration: const InputDecoration(
-                                        border: InputBorder.none),
-                                    controller: vehController,
-                                    style: const TextStyle(
-                                      color: secondary,
+                                  SizedBox(
+                                    child: TextWidget(
+                                      align: TextAlign.start,
+                                      text:
+                                          '${userData?['registrationNumber']}',
                                       fontSize: 14,
+                                      color: secondary,
                                       fontFamily: 'Medium',
                                     ),
                                   ),
-                                ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.check,
-                                    color: Colors.green,
-                                    size: 20,
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                            padding: const EdgeInsets.only(left: 30, right: 30),
+                            child: Divider(color: black)),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 30, right: 30),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  TextWidget(
+                                    text: 'License No.',
+                                    fontSize: 10,
+                                    color: secondary,
+                                    fontFamily: 'Regular',
                                   ),
-                                  onPressed: updateVeh, // Confirm number update
-                                ),
-                                const Padding(padding: EdgeInsets.zero),
-                                IconButton(
-                                  icon: const Icon(Icons.cancel,
-                                      color: Colors.red, size: 17),
-                                  onPressed: () {
-                                    setState(() {
-                                      isVehEditing = false;
-                                      vehController.text = userData![
-                                          'vehicleModel']; // Revert changes
-                                    });
-                                  },
-                                ),
-                              ],
-                            )
-                          : Row(
-                              children: [
-                                TextWidget(
-                                  text:
-                                      '${userData?['vehicleModel']}' ?? '....',
-                                  fontSize: 14,
-                                  color: secondary,
-                                  fontFamily: 'Medium',
-                                ),
-                              ],
-                            ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.only(left: 30, right: 30),
-              child: Divider(
-                color: secondary,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30, right: 30),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextWidget(
-                        text: 'Plate Number',
-                        fontSize: 10,
-                        color: secondary,
-                        fontFamily: 'Regular',
-                      ),
-                      SizedBox(
-                        child: TextWidget(
-                          align: TextAlign.start,
-                          text: '${userData?['plateNumber']}',
-                          fontSize: 14,
-                          color: secondary,
-                          fontFamily: 'Medium',
+                                  SizedBox(
+                                    child: TextWidget(
+                                      align: TextAlign.start,
+                                      text: '${userData?['licenseNumber']}',
+                                      fontSize: 14,
+                                      color: secondary,
+                                      fontFamily: 'Medium',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  TextWidget(
+                                    text: 'Expiry',
+                                    fontSize: 10,
+                                    color: secondary,
+                                    fontFamily: 'Regular',
+                                  ),
+                                  SizedBox(
+                                    child: TextWidget(
+                                      align: TextAlign.start,
+                                      text: '${userData?['expiry']}',
+                                      fontSize: 14,
+                                      color: secondary,
+                                      fontFamily: 'Medium',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextWidget(
-                        text: 'Registration No.',
-                        fontSize: 10,
-                        color: secondary,
-                        fontFamily: 'Regular',
-                      ),
-                      SizedBox(
-                        child: TextWidget(
-                          align: TextAlign.start,
-                          text: '${userData?['registrationNumber']}',
-                          fontSize: 14,
-                          color: secondary,
-                          fontFamily: 'Medium',
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.only(left: 30, right: 30),
-              child: Divider(
-                color: secondary,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30, right: 30),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextWidget(
-                        text: 'License No.',
-                        fontSize: 10,
-                        color: secondary,
-                        fontFamily: 'Regular',
-                      ),
-                      SizedBox(
-                        child: TextWidget(
-                          align: TextAlign.start,
-                          text: '${userData?['licenseNumber']}',
-                          fontSize: 14,
-                          color: secondary,
-                          fontFamily: 'Medium',
-                        ),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextWidget(
-                        text: 'Expiry',
-                        fontSize: 10,
-                        color: secondary,
-                        fontFamily: 'Regular',
-                      ),
-                      SizedBox(
-                        child: TextWidget(
-                          align: TextAlign.start,
-                          text: '${userData?['expiry']}',
-                          fontSize: 14,
-                          color: secondary,
-                          fontFamily: 'Medium',
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.only(left: 30, right: 30),
-              child: Divider(
-                color: secondary,
-              ),
+                ),
+              ],
             ),
             const SizedBox(
               height: 20,
