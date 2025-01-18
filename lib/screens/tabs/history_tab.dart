@@ -84,11 +84,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        TextWidget(
-                          text: 'Good day! Rider $riderName',
-                          fontSize: 22,
-                          fontFamily: 'Bold',
-                          color: Colors.white,
+                        SizedBox(
+                          width: 300,
+                          child: TextWidget(
+                            text: 'Good day! Rider $riderName',
+                            fontSize: 22,
+                            fontFamily: 'Bold',
+                            color: Colors.white,
+                          ),
                         ),
                         GestureDetector(
                           onTap: () {

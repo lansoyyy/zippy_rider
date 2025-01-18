@@ -165,11 +165,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        TextWidget(
-                          text: 'Good Day! Rider ${userData!['name']}',
-                          fontSize: 22,
-                          fontFamily: 'Bold',
-                          color: Colors.white,
+                        SizedBox(
+                          width: 300,
+                          child: TextWidget(
+                            text: 'Good Day! Rider ${userData!['name']}',
+                            fontSize: 22,
+                            fontFamily: 'Bold',
+                            color: Colors.white,
+                          ),
                         ),
                         GestureDetector(
                           onTap: () {
