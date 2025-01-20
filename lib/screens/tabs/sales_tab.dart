@@ -29,6 +29,9 @@ class _SalesTabState extends State<SalesTab> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String? riderName;
   String? profileImage;
+  int orderCount = 0;
+  double totalEarned = 0.0;
+  String driverId = 'I7FTuyOuTNeo0xkCNjxfT0NBWxF3';
 
   @override
   void initState() {
@@ -51,10 +54,42 @@ class _SalesTabState extends State<SalesTab> {
             riderName = userDoc.get('name');
             profileImage = userDoc.get('profileImage');
           });
+          fetchOrderCount();
         }
       }
     } catch (e) {
       print(e);
+    }
+  }
+
+  Future<void> fetchOrderCount() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('Orders')
+          .where('driverId', isEqualTo: driverId)
+          .where('status', isEqualTo: 'Delivered')
+          .get();
+
+      double calculatedTotalPrice = 0.0;
+      for (var doc in querySnapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>?;
+        if (data != null &&
+            data.containsKey('items') &&
+            data['items'] is List) {
+          for (var item in data['items']) {
+            if (item.containsKey('price')) {
+              calculatedTotalPrice += item['price'];
+            }
+          }
+        }
+      }
+
+      setState(() {
+        orderCount = querySnapshot.size;
+        totalEarned = calculatedTotalPrice;
+      });
+    } catch (e) {
+      print('Error fetching order count: $e');
     }
   }
 
@@ -239,7 +274,7 @@ class _SalesTabState extends State<SalesTab> {
               height: 10,
             ),
             TextWidget(
-              text: '₱18,760',
+              text: '₱${totalEarned.toStringAsFixed(2)}',
               fontSize: 64,
               fontFamily: 'Bold',
               color: secondary,
@@ -253,91 +288,86 @@ class _SalesTabState extends State<SalesTab> {
             const SizedBox(
               height: 20,
             ),
-            Container(
-              decoration: const BoxDecoration(
-                color: secondary,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-              ),
-              height: 275,
-              width: double.infinity,
-              child: Column(
-                children: [
-                  Padding(
-                    padding:
-                        const EdgeInsets.only(left: 20, right: 20, top: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        TextWidget(
-                          text: '78 orders',
-                          fontSize: 40,
-                          fontFamily: 'Bold',
-                          color: Colors.white,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            TextWidget(
-                              text: '15.2%',
-                              fontSize: 24,
-                              fontFamily: 'Regular',
-                              color: Colors.white,
-                            ),
-                            TextWidget(
-                              text: 'higher than last week',
-                              fontSize: 8,
-                              fontFamily: 'Regular',
-                              color: Colors.white,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    width: double.infinity,
-                    height: 198,
+            StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('Orders')
+                    .where('driverId',
+                        isEqualTo: 'I7FTuyOuTNeo0xkCNjxfT0NBWxF3')
+                    .where('status', isEqualTo: 'Delivered')
+                    .snapshots(),
+                builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(child: Text('Loading'));
+                  } else if (snapshot.hasError) {
+                    return const Center(child: Text('Something went wrong'));
+                  } else if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  final orders = snapshot.data!.docs;
+                  double calculatedTotalPrice = 0.0;
+                  for (var doc in orders) {
+                    final data = doc.data() as Map<String, dynamic>?;
+                    if (data != null &&
+                        data.containsKey('items') &&
+                        data['items'] is List) {
+                      for (var item in data['items']) {
+                        if (item.containsKey('price')) {
+                          calculatedTotalPrice += item['price'];
+                        }
+                      }
+                    }
+                  }
+
+                  orderCount = orders.length;
+                  totalEarned = calculatedTotalPrice;
+
+                  if (orders.isEmpty) {
+                    return const Center(child: Text('No orders found.'));
+                  }
+                  return Container(
                     decoration: const BoxDecoration(
-                      color: Colors.white,
+                      color: secondary,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(20),
                         topRight: Radius.circular(20),
                       ),
                     ),
+                    height: MediaQuery.of(context).size.height - 500,
+                    width: double.infinity,
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                          padding: const EdgeInsets.only(
+                              left: 20, right: 20, top: 10),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
+                              TextWidget(
+                                text: orderCount == 1
+                                    ? '1 order'
+                                    : '$orderCount orders',
+                                fontSize: 40,
+                                fontFamily: 'Bold',
+                                color: Colors.white,
+                              ),
                               Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   TextWidget(
-                                    text: 'Missions',
-                                    fontSize: 40,
-                                    fontFamily: 'Bold',
-                                    color: secondary,
+                                    text: '15.2%',
+                                    fontSize: 24,
+                                    fontFamily: 'Regular',
+                                    color: Colors.white,
                                   ),
                                   TextWidget(
-                                    text: 'complete missions to earn rewards',
-                                    fontSize: 16,
+                                    text: 'higher than last week',
+                                    fontSize: 8,
                                     fontFamily: 'Regular',
-                                    color: secondary,
+                                    color: Colors.white,
                                   ),
                                 ],
-                              ),
-                              Image.asset(
-                                'assets/images/star.png',
-                                height: 35,
                               ),
                             ],
                           ),
@@ -345,56 +375,109 @@ class _SalesTabState extends State<SalesTab> {
                         const SizedBox(
                           height: 10,
                         ),
-                        Center(
+                        Expanded(
                           child: Container(
-                            height: 65,
-                            width: 320,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: secondary,
+                            width: double.infinity,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                                topRight: Radius.circular(20),
                               ),
-                              borderRadius: BorderRadius.circular(20),
                             ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                                  child: Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      TextWidget(
-                                        text: 'Deliver 10 orders',
-                                        fontSize: 16,
-                                        fontFamily: 'Bold',
-                                        color: secondary,
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          TextWidget(
+                                            text: 'Missions',
+                                            fontSize: 40,
+                                            fontFamily: 'Bold',
+                                            color: secondary,
+                                          ),
+                                          TextWidget(
+                                            text:
+                                                'complete missions to earn rewards',
+                                            fontSize: 16,
+                                            fontFamily: 'Regular',
+                                            color: secondary,
+                                          ),
+                                        ],
                                       ),
-                                      TextWidget(
-                                        text: '5/10',
-                                        fontSize: 16,
-                                        fontFamily: 'Bold',
-                                        color: secondary,
+                                      Image.asset(
+                                        'assets/images/star.png',
+                                        height: 35,
                                       ),
                                     ],
                                   ),
-                                  TextWidget(
-                                    text: 'Prize: Jollibee food voucher',
-                                    fontSize: 12,
-                                    fontFamily: 'Medium',
-                                    color: Colors.black,
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Center(
+                                  child: Container(
+                                    height: 65,
+                                    width: 320,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: secondary,
+                                      ),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(10.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              TextWidget(
+                                                text: 'Deliver 10 orders',
+                                                fontSize: 16,
+                                                fontFamily: 'Bold',
+                                                color: secondary,
+                                              ),
+                                              TextWidget(
+                                                text: '5/10',
+                                                fontSize: 16,
+                                                fontFamily: 'Bold',
+                                                color: secondary,
+                                              ),
+                                            ],
+                                          ),
+                                          TextWidget(
+                                            text:
+                                                'Prize: Jollibee food voucher',
+                                            fontSize: 12,
+                                            fontFamily: 'Medium',
+                                            color: Colors.black,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-            ),
+                  );
+                })
           ],
         ),
       ),
