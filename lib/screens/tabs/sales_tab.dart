@@ -196,80 +196,138 @@ class _SalesTabState extends State<SalesTab> {
             const SizedBox(
               height: 20,
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 20, right: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
+            // Padding(
+            //   padding: const EdgeInsets.only(left: 20, right: 20),
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //     children: [
+            //       Row(
+            //         children: [
+            //           ButtonWidget(
+            //             height: 35,
+            //             width: 75,
+            //             fontSize: 14,
+            //             label: 'Weekly',
+            //             onPressed: () {},
+            //           ),
+            //           const SizedBox(
+            //             width: 20,
+            //           ),
+            //           ButtonWidget(
+            //             height: 35,
+            //             width: 75,
+            //             fontSize: 14,
+            //             label: 'Food',
+            //             onPressed: () {},
+            //           ),
+            //         ],
+            //       ),
+            //       IconButton(
+            //         onPressed: () {},
+            //         icon: const Icon(
+            //           Icons.info,
+            //           color: secondary,
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
+            // const SizedBox(
+            //   height: 20,
+            // ),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            //   children: [
+            //     for (int i = 0; i < 6; i++)
+            //       Container(
+            //         width: 45,
+            //         height: 70,
+            //         decoration: BoxDecoration(
+            //           border: Border.all(
+            //             color: secondary,
+            //           ),
+            //           borderRadius: BorderRadius.circular(
+            //             10,
+            //           ),
+            //         ),
+            //         child: Column(
+            //           mainAxisAlignment: MainAxisAlignment.center,
+            //           crossAxisAlignment: CrossAxisAlignment.center,
+            //           children: [
+            //             TextWidget(
+            //               text: 'Aug',
+            //               fontSize: 12,
+            //               fontFamily: 'Medium',
+            //               color: secondary,
+            //             ),
+            //             TextWidget(
+            //               text: '${i + 1}',
+            //               fontSize: 32,
+            //               fontFamily: 'Bold',
+            //               color: Colors.black,
+            //             ),
+            //           ],
+            //         ),
+            //       ),
+            //   ],
+            // ),
+            // const SizedBox(
+            //   height: 20,
+            // ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: List.generate(7, (index) {
+                DateTime now = DateTime.now();
+                DateTime date =
+                    now.subtract(Duration(days: now.weekday - 1 - index));
+                bool isToday = date.day == now.day &&
+                    date.month == now.month &&
+                    date.year == now.year;
+                return Container(
+                  width: 45,
+                  height: 70,
+                  decoration: BoxDecoration(
+                    color: isToday ? secondary : Colors.transparent,
+                    border: Border.all(
+                      color: secondary,
+                    ),
+                    borderRadius: BorderRadius.circular(
+                      10,
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      ButtonWidget(
-                        height: 35,
-                        width: 75,
-                        fontSize: 14,
-                        label: 'Weekly',
-                        onPressed: () {},
+                      TextWidget(
+                        text: [
+                          'Jan',
+                          'Feb',
+                          'Mar',
+                          'Apr',
+                          'May',
+                          'Jun',
+                          'Jul',
+                          'Aug',
+                          'Sep',
+                          'Oct',
+                          'Nov',
+                          'Dec'
+                        ][date.month - 1],
+                        fontSize: 12,
+                        fontFamily: 'Medium',
+                        color: isToday ? Colors.white : secondary,
                       ),
-                      const SizedBox(
-                        width: 20,
-                      ),
-                      ButtonWidget(
-                        height: 35,
-                        width: 75,
-                        fontSize: 14,
-                        label: 'Food',
-                        onPressed: () {},
+                      TextWidget(
+                        text: '${date.day}',
+                        fontSize: 32,
+                        fontFamily: 'Bold',
+                        color: isToday ? Colors.white : Colors.black,
                       ),
                     ],
                   ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.info,
-                      color: secondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                for (int i = 0; i < 6; i++)
-                  Container(
-                    width: 45,
-                    height: 70,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: secondary,
-                      ),
-                      borderRadius: BorderRadius.circular(
-                        10,
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        TextWidget(
-                          text: 'Aug',
-                          fontSize: 12,
-                          fontFamily: 'Medium',
-                          color: secondary,
-                        ),
-                        TextWidget(
-                          text: '${i + 1}',
-                          fontSize: 32,
-                          fontFamily: 'Bold',
-                          color: Colors.black,
-                        ),
-                      ],
-                    ),
-                  ),
-              ],
+                );
+              }),
             ),
             const SizedBox(
               height: 10,
