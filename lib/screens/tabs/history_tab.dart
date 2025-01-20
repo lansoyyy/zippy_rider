@@ -241,7 +241,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                         color: secondary,
                                       ),
                                       TextWidget(
-                                        text: '₱${order['subtotal']}',
+                                        text:
+                                            '₱${order['total'].toStringAsFixed(2)}',
                                         fontSize: 19,
                                         fontFamily: 'Medium',
                                         color: Colors.black,

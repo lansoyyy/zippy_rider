@@ -272,11 +272,72 @@ class _ProfilePageState extends State<ProfilePage> {
                           width: 10,
                         ),
                         GestureDetector(
-                          onTap: () async {
-                            await FirebaseAuth.instance.signOut();
-                            Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                    builder: (context) => const LoginScreen()));
+                          onTap: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: TextWidget(
+                                      text: 'Are you sure you want to Logout?',
+                                      fontSize: 20,
+                                      color: secondary,
+                                      fontFamily: 'Bold',
+                                    ),
+                                    actions: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 35, vertical: 10),
+                                        decoration: BoxDecoration(
+                                            color: secondary,
+                                            borderRadius:
+                                                BorderRadius.circular(10)),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: TextWidget(
+                                            text: 'Cancel',
+                                            fontSize: 18,
+                                            color: white,
+                                            fontFamily: "Medium",
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 35, vertical: 10),
+                                        decoration: BoxDecoration(
+                                            color: Colors.transparent,
+                                            border:
+                                                Border.all(color: secondary),
+                                            borderRadius:
+                                                BorderRadius.circular(10)),
+                                        child: GestureDetector(
+                                          onTap: () async {
+                                            await FirebaseAuth.instance
+                                                .signOut();
+                                            Navigator.of(context)
+                                                .pushAndRemoveUntil(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const LoginScreen()),
+                                              (Route<dynamic> route) => false,
+                                            );
+
+                                            showToast(
+                                                'Successfully logged out');
+                                          },
+                                          child: TextWidget(
+                                            text: 'Logout',
+                                            fontSize: 18,
+                                            color: secondary,
+                                            fontFamily: "Medium",
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                });
                           },
                           child: const Icon(
                             Icons.logout,
@@ -443,7 +504,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               },
                               child: TextWidget(
                                 text: 'Edit',
-                                fontSize: 25,
+                                fontSize: 20,
                                 color: Colors.white,
                                 fontFamily: 'Medium',
                               ),
@@ -471,23 +532,24 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: Column(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(left: 30, top: 30),
+                          padding: const EdgeInsets.only(
+                              left: 30, top: 30, right: 70),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               TextWidget(
                                 text: 'EMAIL ADDRESS',
-                                fontSize: 10,
-                                color: secondary,
+                                fontSize: 16,
+                                color: black,
                                 fontFamily: 'Regular',
                               ),
-                              const SizedBox(
-                                width: 120,
-                              ),
+                              // const SizedBox(
+                              //   width: 120,
+                              // ),
                               TextWidget(
                                 text: 'MOBILE NUMBER',
-                                fontSize: 10,
-                                color: secondary,
+                                fontSize: 16,
+                                color: black,
                                 fontFamily: 'Regular',
                               ),
                             ],
@@ -509,7 +571,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             controller: emailController,
                                             style: const TextStyle(
                                               color: secondary,
-                                              fontSize: 12,
+                                              fontSize: 16,
                                               fontFamily: 'Medium',
                                             ),
                                           ),
@@ -556,7 +618,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         TextWidget(
                                           text:
                                               '${userData?['email']}' ?? '....',
-                                          fontSize: 14,
+                                          fontSize: 16,
                                           color: secondary,
                                           fontFamily: 'Medium',
                                         ),
@@ -580,7 +642,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             controller: numberController,
                                             style: const TextStyle(
                                               color: secondary,
-                                              fontSize: 14,
+                                              fontSize: 16,
                                               fontFamily: 'Medium',
                                             ),
                                           ),
@@ -636,8 +698,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                   children: [
                                     TextWidget(
                                       text: 'BIRTHDATE',
-                                      fontSize: 10,
-                                      color: secondary,
+                                      fontSize: 16,
+                                      color: black,
                                       fontFamily: 'Regular',
                                     ),
                                     isBdayEditing
@@ -653,7 +715,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                   controller: bdayController,
                                                   style: const TextStyle(
                                                     color: secondary,
-                                                    fontSize: 14,
+                                                    fontSize: 16,
                                                     fontFamily: 'Medium',
                                                   ),
                                                 ),
@@ -688,7 +750,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                               TextWidget(
                                                 text: '${userData?['bday']}' ??
                                                     '....',
-                                                fontSize: 14,
+                                                fontSize: 16,
                                                 color: secondary,
                                                 fontFamily: 'Medium',
                                               ),
@@ -712,8 +774,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                 children: [
                                   TextWidget(
                                     text: 'Address',
-                                    fontSize: 10,
-                                    color: secondary,
+                                    fontSize: 16,
+                                    color: black,
                                     fontFamily: 'Regular',
                                   ),
                                   isAddEditing
@@ -729,7 +791,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 controller: addController,
                                                 style: const TextStyle(
                                                   color: secondary,
-                                                  fontSize: 14,
+                                                  fontSize: 16,
                                                   fontFamily: 'Medium',
                                                 ),
                                               ),
@@ -763,7 +825,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             TextWidget(
                                               text: '${userData?['address']}' ??
                                                   '....',
-                                              fontSize: 14,
+                                              fontSize: 16,
                                               color: secondary,
                                               fontFamily: 'Medium',
                                             ),
@@ -788,8 +850,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                 children: [
                                   TextWidget(
                                     text: 'Vehicle Model',
-                                    fontSize: 10,
-                                    color: secondary,
+                                    fontSize: 16,
+                                    color: black,
                                     fontFamily: 'Regular',
                                   ),
                                   isVehEditing
@@ -805,7 +867,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 controller: vehController,
                                                 style: const TextStyle(
                                                   color: secondary,
-                                                  fontSize: 14,
+                                                  fontSize: 16,
                                                   fontFamily: 'Medium',
                                                 ),
                                               ),
@@ -840,7 +902,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                               text:
                                                   '${userData?['vehicleModel']}' ??
                                                       '....',
-                                              fontSize: 14,
+                                              fontSize: 16,
                                               color: secondary,
                                               fontFamily: 'Medium',
                                             ),
@@ -864,15 +926,15 @@ class _ProfilePageState extends State<ProfilePage> {
                                 children: [
                                   TextWidget(
                                     text: 'Plate Number',
-                                    fontSize: 10,
-                                    color: secondary,
+                                    fontSize: 16,
+                                    color: black,
                                     fontFamily: 'Regular',
                                   ),
                                   SizedBox(
                                     child: TextWidget(
                                       align: TextAlign.start,
                                       text: '${userData?['plateNumber']}',
-                                      fontSize: 14,
+                                      fontSize: 16,
                                       color: secondary,
                                       fontFamily: 'Medium',
                                     ),
@@ -884,8 +946,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                 children: [
                                   TextWidget(
                                     text: 'Registration No.',
-                                    fontSize: 10,
-                                    color: secondary,
+                                    fontSize: 16,
+                                    color: black,
                                     fontFamily: 'Regular',
                                   ),
                                   SizedBox(
@@ -893,7 +955,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       align: TextAlign.start,
                                       text:
                                           '${userData?['registrationNumber']}',
-                                      fontSize: 14,
+                                      fontSize: 16,
                                       color: secondary,
                                       fontFamily: 'Medium',
                                     ),
@@ -916,15 +978,15 @@ class _ProfilePageState extends State<ProfilePage> {
                                 children: [
                                   TextWidget(
                                     text: 'License No.',
-                                    fontSize: 10,
-                                    color: secondary,
+                                    fontSize: 16,
+                                    color: black,
                                     fontFamily: 'Regular',
                                   ),
                                   SizedBox(
                                     child: TextWidget(
                                       align: TextAlign.start,
                                       text: '${userData?['licenseNumber']}',
-                                      fontSize: 14,
+                                      fontSize: 16,
                                       color: secondary,
                                       fontFamily: 'Medium',
                                     ),
@@ -936,8 +998,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                 children: [
                                   TextWidget(
                                     text: 'Expiry',
-                                    fontSize: 10,
-                                    color: secondary,
+                                    fontSize: 16,
+                                    color: black,
                                     fontFamily: 'Regular',
                                   ),
                                   SizedBox(
