@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:zippy/screens/home_screen.dart';
 import 'package:zippy/screens/pages/completed_page.dart';
 import 'package:zippy/screens/pages/profile_page.dart';
@@ -29,6 +30,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String? riderName;
   String? profileImage;
+  String driverId = 'I7FTuyOuTNeo0xkCNjxfT0NBWxF3';
   @override
   void initState() {
     super.initState();
@@ -151,94 +153,136 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ],
             ),
           ),
-          const SizedBox(
-            height: 20,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 20, right: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ButtonWidget(
-                  height: 35,
-                  width: 75,
-                  fontSize: 14,
-                  label: 'Food',
-                  onPressed: () {},
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.info,
-                    color: secondary,
+          // const SizedBox(
+          //   height: 20,
+          // ),
+          // Padding(
+          //   padding: const EdgeInsets.only(left: 20, right: 20),
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //     children: [
+          //       ButtonWidget(
+          //         height: 35,
+          //         width: 75,
+          //         fontSize: 14,
+          //         label: 'Food',
+          //         onPressed: () {},
+          //       ),
+          //       IconButton(
+          //         onPressed: () {},
+          //         icon: const Icon(
+          //           Icons.info,
+          //           color: secondary,
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
+          // const SizedBox(
+          //   height: 20,
+          // ),
+          StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('Orders')
+                  .where('driverId', isEqualTo: driverId)
+                  .where('status', isEqualTo: 'Delivered')
+                  .snapshots(),
+              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(child: Text('Loading'));
+                } else if (snapshot.hasError) {
+                  return const Center(child: Text('Something went wrong'));
+                } else if (snapshot.connectionState ==
+                    ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                final orders = snapshot.data!.docs;
+
+                if (orders.isEmpty) {
+                  return const Center(child: Text('No orders found.'));
+                }
+
+                return Expanded(
+                  child: ListView.builder(
+                    itemCount: orders.length,
+                    itemBuilder: (context, index) {
+                      var order = orders[index];
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (context) => const CompletedPage()),
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              left: 20, right: 20, bottom: 10),
+                          child: Container(
+                            height: 125,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: secondary),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(15),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      TextWidget(
+                                        text: '${order['merchantName']}',
+                                        fontSize: 28,
+                                        fontFamily: 'Bold',
+                                        color: secondary,
+                                      ),
+                                      TextWidget(
+                                        text: '₱${order['subtotal']}',
+                                        fontSize: 19,
+                                        fontFamily: 'Medium',
+                                        color: Colors.black,
+                                      ),
+                                    ],
+                                  ),
+                                  TextWidget(
+                                    text: 'Food Delivery',
+                                    fontSize: 19,
+                                    fontFamily: 'Medium',
+                                    color: secondary,
+                                  ),
+                                  TextWidget(
+                                    text: '${order['merchantId']}',
+                                    fontSize: 19,
+                                    fontFamily: 'Medium',
+                                    color: Colors.black,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      TextWidget(
+                                        text:
+                                            'Completed on ${DateFormat('MMMM d, y \'at\' h:mm a').format(order['date'].toDate())}', // Need to put date completion in the db
+                                        fontSize: 15,
+                                        color: secondary,
+                                        fontFamily: 'Medium',
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          GestureDetector(
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const CompletedPage()),
-              );
-            },
-            child: Container(
-              height: 125,
-              width: 320,
-              decoration: BoxDecoration(
-                border: Border.all(color: secondary),
-                borderRadius: BorderRadius.circular(
-                  10,
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        TextWidget(
-                          text: 'Bluebird Coffee',
-                          fontSize: 24,
-                          fontFamily: 'Bold',
-                          color: secondary,
-                        ),
-                        TextWidget(
-                          text: '₱570.00',
-                          fontSize: 16,
-                          fontFamily: 'Medium',
-                          color: Colors.black,
-                        ),
-                      ],
-                    ),
-                    TextWidget(
-                      text: 'Food Delivery',
-                      fontSize: 16,
-                      fontFamily: 'Medium',
-                      color: secondary,
-                    ),
-                    TextWidget(
-                      text: '111 2222 3333 444',
-                      fontSize: 16,
-                      fontFamily: 'Medium',
-                      color: Colors.black,
-                    ),
-                    TextWidget(
-                      text: 'Completed on 13/08/24 at 4:50PM ',
-                      fontSize: 12,
-                      fontFamily: 'Medium',
-                      color: Colors.black,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+                );
+              }),
         ],
       ),
     );

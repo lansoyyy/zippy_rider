@@ -273,21 +273,6 @@ class _SalesTabState extends State<SalesTab> {
             const SizedBox(
               height: 10,
             ),
-            TextWidget(
-              text: '₱${totalEarned.toStringAsFixed(2)}',
-              fontSize: 64,
-              fontFamily: 'Bold',
-              color: secondary,
-            ),
-            TextWidget(
-              text: 'total earned this week',
-              fontSize: 18,
-              fontFamily: 'Medium',
-              color: secondary,
-            ),
-            const SizedBox(
-              height: 20,
-            ),
             StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('Orders')
@@ -326,156 +311,179 @@ class _SalesTabState extends State<SalesTab> {
                   if (orders.isEmpty) {
                     return const Center(child: Text('No orders found.'));
                   }
-                  return Container(
-                    decoration: const BoxDecoration(
-                      color: secondary,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20),
+                  return Column(
+                    children: [
+                      TextWidget(
+                        text: '₱${totalEarned.toStringAsFixed(2)}',
+                        fontSize: 64,
+                        fontFamily: 'Bold',
+                        color: secondary,
                       ),
-                    ),
-                    height: MediaQuery.of(context).size.height - 500,
-                    width: double.infinity,
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              left: 20, right: 20, top: 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              TextWidget(
-                                text: orderCount == 1
-                                    ? '1 order'
-                                    : '$orderCount orders',
-                                fontSize: 40,
-                                fontFamily: 'Bold',
-                                color: Colors.white,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  TextWidget(
-                                    text: '15.2%',
-                                    fontSize: 24,
-                                    fontFamily: 'Regular',
-                                    color: Colors.white,
-                                  ),
-                                  TextWidget(
-                                    text: 'higher than last week',
-                                    fontSize: 8,
-                                    fontFamily: 'Regular',
-                                    color: Colors.white,
-                                  ),
-                                ],
-                              ),
-                            ],
+                      TextWidget(
+                        text: 'total earned this week',
+                        fontSize: 18,
+                        fontFamily: 'Medium',
+                        color: secondary,
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Container(
+                        decoration: const BoxDecoration(
+                          color: secondary,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20),
                           ),
                         ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Expanded(
-                          child: Container(
-                            width: double.infinity,
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(20),
-                                topRight: Radius.circular(20),
-                              ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(20, 10, 20, 10),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                        height: MediaQuery.of(context).size.height - 500,
+                        width: double.infinity,
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 20, right: 20, top: 10),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  TextWidget(
+                                    text: orderCount == 1
+                                        ? '1 order'
+                                        : '$orderCount orders',
+                                    fontSize: 40,
+                                    fontFamily: 'Bold',
+                                    color: Colors.white,
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          TextWidget(
-                                            text: 'Missions',
-                                            fontSize: 40,
-                                            fontFamily: 'Bold',
-                                            color: secondary,
-                                          ),
-                                          TextWidget(
-                                            text:
-                                                'complete missions to earn rewards',
-                                            fontSize: 16,
-                                            fontFamily: 'Regular',
-                                            color: secondary,
-                                          ),
-                                        ],
+                                      TextWidget(
+                                        text: '15.2%',
+                                        fontSize: 24,
+                                        fontFamily: 'Regular',
+                                        color: Colors.white,
                                       ),
-                                      Image.asset(
-                                        'assets/images/star.png',
-                                        height: 35,
+                                      TextWidget(
+                                        text: 'higher than last week',
+                                        fontSize: 8,
+                                        fontFamily: 'Regular',
+                                        color: Colors.white,
                                       ),
                                     ],
                                   ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Expanded(
+                              child: Container(
+                                width: double.infinity,
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(20),
+                                    topRight: Radius.circular(20),
+                                  ),
                                 ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Center(
-                                  child: Container(
-                                    height: 65,
-                                    width: 320,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: secondary,
-                                      ),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(10.0),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          20, 10, 20, 10),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               TextWidget(
-                                                text: 'Deliver 10 orders',
-                                                fontSize: 16,
+                                                text: 'Missions',
+                                                fontSize: 40,
                                                 fontFamily: 'Bold',
                                                 color: secondary,
                                               ),
                                               TextWidget(
-                                                text: '5/10',
+                                                text:
+                                                    'complete missions to earn rewards',
                                                 fontSize: 16,
-                                                fontFamily: 'Bold',
+                                                fontFamily: 'Regular',
                                                 color: secondary,
                                               ),
                                             ],
                                           ),
-                                          TextWidget(
-                                            text:
-                                                'Prize: Jollibee food voucher',
-                                            fontSize: 12,
-                                            fontFamily: 'Medium',
-                                            color: Colors.black,
+                                          Image.asset(
+                                            'assets/images/star.png',
+                                            height: 35,
                                           ),
                                         ],
                                       ),
                                     ),
-                                  ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    Center(
+                                      child: Container(
+                                        height: 65,
+                                        width: 320,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: secondary,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(10.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  TextWidget(
+                                                    text: 'Deliver 10 orders',
+                                                    fontSize: 16,
+                                                    fontFamily: 'Bold',
+                                                    color: secondary,
+                                                  ),
+                                                  TextWidget(
+                                                    text: '5/10',
+                                                    fontSize: 16,
+                                                    fontFamily: 'Bold',
+                                                    color: secondary,
+                                                  ),
+                                                ],
+                                              ),
+                                              TextWidget(
+                                                text:
+                                                    'Prize: Jollibee food voucher',
+                                                fontSize: 12,
+                                                fontFamily: 'Medium',
+                                                color: Colors.black,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   );
                 })
           ],
