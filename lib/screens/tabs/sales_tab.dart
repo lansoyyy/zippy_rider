@@ -125,6 +125,7 @@ class _SalesTabState extends State<SalesTab> {
                           SizedBox(
                             width: 300,
                             child: TextWidget(
+                              align: TextAlign.start,
                               text: 'Good day! Rider $riderName',
                               fontSize: 22,
                               fontFamily: 'Bold',

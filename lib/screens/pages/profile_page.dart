@@ -278,7 +278,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 builder: (context) {
                                   return AlertDialog(
                                     title: TextWidget(
-                                      text: 'Are you sure you want to Logout?',
+                                      text: 'Are you sure you want to logout?',
                                       fontSize: 20,
                                       color: secondary,
                                       fontFamily: 'Bold',
@@ -433,24 +433,18 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ],
                     )
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        TextWidget(
-                          text: '${userData?['name']}' ?? '....',
-                          fontSize: 28,
-                          color: secondary,
-                          fontFamily: 'Bold',
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.edit, color: secondary),
-                          onPressed: () {
-                            setState(() {
-                              isNameEditing = true;
-                            });
-                          },
-                        ),
-                      ],
+                  : GestureDetector(
+                      onDoubleTap: () {
+                        setState(() {
+                          isNameEditing = true;
+                        });
+                      },
+                      child: TextWidget(
+                        text: '${userData?['name']}' ?? '....',
+                        fontSize: 28,
+                        color: secondary,
+                        fontFamily: 'Bold',
+                      ),
                     ),
             ),
             const SizedBox(
@@ -468,13 +462,12 @@ class _ProfilePageState extends State<ProfilePage> {
                       topRight: Radius.circular(20),
                     ),
                   ),
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.only(top: 20, left: 25, right: 25),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Row(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding:
+                            const EdgeInsets.only(left: 20, right: 20, top: 10),
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             TextWidget(
@@ -485,34 +478,35 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                setState(() {
-                                  isNumEditing = true;
-                                  isEmailEditing = true;
-                                  isBdayEditing = true;
-                                  isAddEditing = true;
-                                  isVehEditing = true;
-                                  numberController.text =
-                                      userData!['number'] ?? '';
-                                  emailController.text =
-                                      userData!['email'] ?? '';
-                                  bdayController.text = userData!['bday'] ?? '';
-                                  addController.text =
-                                      userData!['address'] ?? '';
-                                  vehController.text =
-                                      userData!['vehicleModel'] ?? '';
-                                });
+                                // setState(() {
+                                //   isNumEditing = true;
+                                //   isEmailEditing = true;
+                                //   isBdayEditing = true;
+                                //   isAddEditing = true;
+                                //   isVehEditing = true;
+                                //   numberController.text =
+                                //       userData!['number'] ?? '';
+                                //   emailController.text =
+                                //       userData!['email'] ?? '';
+                                //   bdayController.text = userData!['bday'] ?? '';
+                                //   addController.text =
+                                //       userData!['address'] ?? '';
+                                //   vehController.text =
+                                //       userData!['vehicleModel'] ?? '';
+                                // });
                               },
-                              child: TextWidget(
-                                text: 'Edit',
-                                fontSize: 20,
-                                color: Colors.white,
-                                fontFamily: 'Medium',
-                              ),
+                              child: IconButton(
+                                  onPressed: () {
+                                    showToast(
+                                        'Double click each field to edit information');
+                                  },
+                                  icon: const Icon(Icons.help_outline_rounded,
+                                      color: Colors.white)),
                             ),
                           ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
                 Positioned(
@@ -529,42 +523,32 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                     width: double.infinity,
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              left: 30, top: 30, right: 70),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              TextWidget(
-                                text: 'EMAIL ADDRESS',
-                                fontSize: 16,
-                                color: black,
-                                fontFamily: 'Regular',
-                              ),
-                              // const SizedBox(
-                              //   width: 120,
-                              // ),
-                              TextWidget(
-                                text: 'MOBILE NUMBER',
-                                fontSize: 16,
-                                color: black,
-                                fontFamily: 'Regular',
-                              ),
-                            ],
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 30, right: 30),
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 30),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                TextWidget(
+                                  text: 'EMAIL ADDRESS',
+                                  fontSize: 16,
+                                  color: black,
+                                  fontFamily: 'Regular',
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 30),
-                          child: Row(
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               isEmailEditing
                                   ? Row(
                                       children: [
                                         SizedBox(
-                                          width: 80,
+                                          width: 200,
                                           child: TextField(
                                             decoration: const InputDecoration(
                                                 border: InputBorder.none),
@@ -613,159 +597,171 @@ class _ProfilePageState extends State<ProfilePage> {
                                         ),
                                       ],
                                     )
-                                  : Row(
-                                      children: [
-                                        TextWidget(
-                                          text:
-                                              '${userData?['email']}' ?? '....',
-                                          fontSize: 16,
-                                          color: secondary,
-                                          fontFamily: 'Medium',
-                                        ),
-                                      ],
-                                    ),
-                              isNumEditing
-                                  ? const SizedBox(
-                                      width: 0,
-                                    )
-                                  : const SizedBox(
-                                      width: 85,
-                                    ),
-                              isNumEditing
-                                  ? Row(
-                                      children: [
-                                        SizedBox(
-                                          width: 80,
-                                          child: TextField(
-                                            decoration: const InputDecoration(
-                                                border: InputBorder.none),
-                                            controller: numberController,
-                                            style: const TextStyle(
-                                              color: secondary,
-                                              fontSize: 16,
-                                              fontFamily: 'Medium',
-                                            ),
-                                          ),
-                                        ),
-                                        IconButton(
-                                          icon: const Icon(
-                                            Icons.check,
-                                            color: Colors.green,
-                                            size: 20,
-                                          ),
-                                          onPressed:
-                                              updateNumber, // Confirm number update
-                                        ),
-                                        const Padding(padding: EdgeInsets.zero),
-                                        IconButton(
-                                          icon: const Icon(Icons.cancel,
-                                              color: Colors.red, size: 17),
-                                          onPressed: () {
-                                            setState(() {
-                                              isNumEditing = false;
-                                              numberController.text = userData![
-                                                  'number']; // Revert changes
-                                            });
-                                          },
-                                        ),
-                                      ],
-                                    )
-                                  : Row(
-                                      children: [
-                                        TextWidget(
-                                          text: '${userData?['number']}' ??
-                                              '....',
-                                          fontSize: 14,
-                                          color: secondary,
-                                          fontFamily: 'Medium',
-                                        ),
-                                      ],
+                                  : GestureDetector(
+                                      onDoubleTap: () {
+                                        setState(() {
+                                          isEmailEditing = true;
+                                        });
+                                      },
+                                      child: TextWidget(
+                                        text: '${userData?['email']}' ?? '....',
+                                        fontSize: 16,
+                                        color: secondary,
+                                        fontFamily: 'Medium',
+                                      ),
                                     ),
                             ],
                           ),
-                        ),
-                        Padding(
-                            padding: const EdgeInsets.only(left: 30, right: 30),
-                            child: Divider(color: black)),
-                        Padding(
-                            padding: const EdgeInsets.only(left: 30, right: 30),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    TextWidget(
-                                      text: 'BIRTHDATE',
-                                      fontSize: 16,
-                                      color: black,
-                                      fontFamily: 'Regular',
-                                    ),
-                                    isBdayEditing
-                                        ? Row(
-                                            children: [
-                                              SizedBox(
-                                                width: 80,
-                                                child: TextField(
-                                                  decoration:
-                                                      const InputDecoration(
-                                                          border:
-                                                              InputBorder.none),
-                                                  controller: bdayController,
-                                                  style: const TextStyle(
-                                                    color: secondary,
-                                                    fontSize: 16,
-                                                    fontFamily: 'Medium',
-                                                  ),
+                          Divider(color: black),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  TextWidget(
+                                    text: 'MOBILE NUMBER',
+                                    fontSize: 16,
+                                    color: black,
+                                    fontFamily: 'Regular',
+                                  ),
+                                  isNumEditing
+                                      ? Row(
+                                          children: [
+                                            SizedBox(
+                                              width: 200,
+                                              child: TextField(
+                                                maxLength: 11,
+                                                keyboardType:
+                                                    const TextInputType
+                                                        .numberWithOptions(),
+                                                decoration:
+                                                    const InputDecoration(
+                                                        border:
+                                                            InputBorder.none),
+                                                controller: numberController,
+                                                style: const TextStyle(
+                                                  color: secondary,
+                                                  fontSize: 16,
+                                                  fontFamily: 'Medium',
                                                 ),
                                               ),
-                                              IconButton(
-                                                icon: const Icon(
-                                                  Icons.check,
-                                                  color: Colors.green,
-                                                  size: 20,
-                                                ),
-                                                onPressed:
-                                                    updateBday, // Confirm number update
+                                            ),
+                                            IconButton(
+                                              icon: const Icon(
+                                                Icons.check,
+                                                color: Colors.green,
+                                                size: 20,
                                               ),
-                                              const Padding(
-                                                  padding: EdgeInsets.zero),
-                                              IconButton(
-                                                icon: const Icon(Icons.cancel,
-                                                    color: Colors.red,
-                                                    size: 17),
-                                                onPressed: () {
-                                                  setState(() {
-                                                    isBdayEditing = false;
-                                                    bdayController.text = userData![
-                                                        'bday']; // Revert changes
-                                                  });
-                                                },
-                                              ),
-                                            ],
-                                          )
-                                        : Row(
-                                            children: [
-                                              TextWidget(
-                                                text: '${userData?['bday']}' ??
-                                                    '....',
-                                                fontSize: 16,
-                                                color: secondary,
-                                                fontFamily: 'Medium',
-                                              ),
-                                            ],
+                                              onPressed:
+                                                  updateNumber, // Confirm number update
+                                            ),
+                                            const Padding(
+                                                padding: EdgeInsets.zero),
+                                            IconButton(
+                                              icon: const Icon(Icons.cancel,
+                                                  color: Colors.red, size: 17),
+                                              onPressed: () {
+                                                setState(() {
+                                                  isNumEditing = false;
+                                                  numberController.text = userData![
+                                                      'number']; // Revert changes
+                                                });
+                                              },
+                                            ),
+                                          ],
+                                        )
+                                      : GestureDetector(
+                                          onDoubleTap: () => setState(() {
+                                            isNumEditing = true;
+                                          }),
+                                          child: TextWidget(
+                                            text: '${userData?['number']}' ??
+                                                '....',
+                                            fontSize: 14,
+                                            color: secondary,
+                                            fontFamily: 'Medium',
                                           ),
-                                  ],
-                                ),
-                              ],
-                            )),
-                        Padding(
-                            padding: const EdgeInsets.only(left: 30, right: 30),
-                            child: Divider(color: black)),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 30, right: 30),
-                          child: Row(
+                                        ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Divider(color: black),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  TextWidget(
+                                    text: 'BIRTHDATE',
+                                    fontSize: 16,
+                                    color: black,
+                                    fontFamily: 'Regular',
+                                  ),
+                                  isBdayEditing
+                                      ? Row(
+                                          children: [
+                                            SizedBox(
+                                              width: 200,
+                                              child: TextField(
+                                                decoration:
+                                                    const InputDecoration(
+                                                        border:
+                                                            InputBorder.none),
+                                                controller: bdayController,
+                                                style: const TextStyle(
+                                                  color: secondary,
+                                                  fontSize: 16,
+                                                  fontFamily: 'Medium',
+                                                ),
+                                              ),
+                                            ),
+                                            IconButton(
+                                              icon: const Icon(
+                                                Icons.check,
+                                                color: Colors.green,
+                                                size: 20,
+                                              ),
+                                              onPressed:
+                                                  updateBday, // Confirm number update
+                                            ),
+                                            const Padding(
+                                                padding: EdgeInsets.zero),
+                                            IconButton(
+                                              icon: const Icon(Icons.cancel,
+                                                  color: Colors.red, size: 17),
+                                              onPressed: () {
+                                                setState(() {
+                                                  isBdayEditing = false;
+                                                  bdayController.text = userData![
+                                                      'bday']; // Revert changes
+                                                });
+                                              },
+                                            ),
+                                          ],
+                                        )
+                                      : GestureDetector(
+                                          onDoubleTap: () => setState(() {
+                                            isBdayEditing = true;
+                                          }),
+                                          child: TextWidget(
+                                            text: '${userData?['bday']}' ??
+                                                '....',
+                                            fontSize: 16,
+                                            color: secondary,
+                                            fontFamily: 'Medium',
+                                          ),
+                                        ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Divider(color: black),
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
@@ -782,7 +778,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ? Row(
                                           children: [
                                             SizedBox(
-                                              width: 80,
+                                              width: 200,
                                               child: TextField(
                                                 decoration:
                                                     const InputDecoration(
@@ -820,28 +816,24 @@ class _ProfilePageState extends State<ProfilePage> {
                                             ),
                                           ],
                                         )
-                                      : Row(
-                                          children: [
-                                            TextWidget(
-                                              text: '${userData?['address']}' ??
-                                                  '....',
-                                              fontSize: 16,
-                                              color: secondary,
-                                              fontFamily: 'Medium',
-                                            ),
-                                          ],
+                                      : GestureDetector(
+                                          onDoubleTap: () => setState(() {
+                                            isAddEditing = true;
+                                          }),
+                                          child: TextWidget(
+                                            text: '${userData?['address']}' ??
+                                                '....',
+                                            fontSize: 16,
+                                            color: secondary,
+                                            fontFamily: 'Medium',
+                                          ),
                                         ),
                                 ],
                               ),
                             ],
                           ),
-                        ),
-                        Padding(
-                            padding: const EdgeInsets.only(left: 30, right: 30),
-                            child: Divider(color: black)),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 30, right: 30),
-                          child: Row(
+                          Divider(color: black),
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
@@ -858,7 +850,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ? Row(
                                           children: [
                                             SizedBox(
-                                              width: 80,
+                                              width: 200,
                                               child: TextField(
                                                 decoration:
                                                     const InputDecoration(
@@ -896,29 +888,25 @@ class _ProfilePageState extends State<ProfilePage> {
                                             ),
                                           ],
                                         )
-                                      : Row(
-                                          children: [
-                                            TextWidget(
-                                              text:
-                                                  '${userData?['vehicleModel']}' ??
-                                                      '....',
-                                              fontSize: 16,
-                                              color: secondary,
-                                              fontFamily: 'Medium',
-                                            ),
-                                          ],
+                                      : GestureDetector(
+                                          onDoubleTap: () => setState(() {
+                                            isVehEditing = true;
+                                          }),
+                                          child: TextWidget(
+                                            text:
+                                                '${userData?['vehicleModel']}' ??
+                                                    '....',
+                                            fontSize: 16,
+                                            color: secondary,
+                                            fontFamily: 'Medium',
+                                          ),
                                         ),
                                 ],
                               ),
                             ],
                           ),
-                        ),
-                        Padding(
-                            padding: const EdgeInsets.only(left: 30, right: 30),
-                            child: Divider(color: black)),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 30, right: 30),
-                          child: Row(
+                          Divider(color: black),
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Column(
@@ -964,13 +952,8 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                             ],
                           ),
-                        ),
-                        Padding(
-                            padding: const EdgeInsets.only(left: 30, right: 30),
-                            child: Divider(color: black)),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 30, right: 30),
-                          child: Row(
+                          Divider(color: black),
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Column(
@@ -1015,8 +998,8 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                             ],
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

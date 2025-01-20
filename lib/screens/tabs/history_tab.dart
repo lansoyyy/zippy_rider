@@ -89,6 +89,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         SizedBox(
                           width: 300,
                           child: TextWidget(
+                            align: TextAlign.start,
                             text: 'Good day! Rider $riderName',
                             fontSize: 22,
                             fontFamily: 'Bold',
