@@ -601,6 +601,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                       onDoubleTap: () {
                                         setState(() {
                                           isEmailEditing = true;
+                                          emailController.text =
+                                              userData!['email'];
                                         });
                                       },
                                       child: TextWidget(
@@ -675,6 +677,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                       : GestureDetector(
                                           onDoubleTap: () => setState(() {
                                             isNumEditing = true;
+                                            numberController.text =
+                                                userData!['number'];
                                           }),
                                           child: TextWidget(
                                             text: '${userData?['number']}' ??
@@ -747,6 +751,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                       : GestureDetector(
                                           onDoubleTap: () => setState(() {
                                             isBdayEditing = true;
+                                            bdayController.text =
+                                                userData!['bday'];
                                           }),
                                           child: TextWidget(
                                             text: '${userData?['bday']}' ??
@@ -819,6 +825,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                       : GestureDetector(
                                           onDoubleTap: () => setState(() {
                                             isAddEditing = true;
+                                            addController.text =
+                                                userData!['address'];
                                           }),
                                           child: TextWidget(
                                             text: '${userData?['address']}' ??
@@ -891,6 +899,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                       : GestureDetector(
                                           onDoubleTap: () => setState(() {
                                             isVehEditing = true;
+                                            vehController.text =
+                                                userData!['vehicleModel'];
                                           }),
                                           child: TextWidget(
                                             text:

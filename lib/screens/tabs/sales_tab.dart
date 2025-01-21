@@ -349,18 +349,27 @@ class _SalesTabState extends State<SalesTab> {
                     return const Center(child: CircularProgressIndicator());
                   }
 
+                  // final orders = snapshot.data!.docs;
+                  // double calculatedTotalPrice = 0.0;
+                  // for (var doc in orders) {
+                  //   final data = doc.data() as Map<String, dynamic>?;
+                  //   if (data != null &&
+                  //       data.containsKey('items') &&
+                  //       data['items'] is List) {
+                  //     for (var item in data['items']) {
+                  //       if (item.containsKey('price')) {
+                  //         calculatedTotalPrice += item['price'];
+                  //       }
+                  //     }
+                  //   }
+                  // }
+
                   final orders = snapshot.data!.docs;
                   double calculatedTotalPrice = 0.0;
                   for (var doc in orders) {
                     final data = doc.data() as Map<String, dynamic>?;
-                    if (data != null &&
-                        data.containsKey('items') &&
-                        data['items'] is List) {
-                      for (var item in data['items']) {
-                        if (item.containsKey('price')) {
-                          calculatedTotalPrice += item['price'];
-                        }
-                      }
+                    if (data != null && data.containsKey('total')) {
+                      calculatedTotalPrice += data['total'];
                     }
                   }
 
