@@ -437,6 +437,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       onDoubleTap: () {
                         setState(() {
                           isNameEditing = true;
+                          nameController.text = userData!['name'];
                         });
                       },
                       child: TextWidget(

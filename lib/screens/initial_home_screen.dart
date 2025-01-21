@@ -69,8 +69,8 @@ class _InitialHomeScreenState extends State<InitialHomeScreen> {
               child: Align(
                 alignment: Alignment.topRight,
                 child: Container(
-                  width: 160,
-                  height: 90,
+                  width: 250,
+                  height: 120,
                   decoration: BoxDecoration(
                     border: Border.all(color: secondary, width: 1),
                     borderRadius: const BorderRadius.only(

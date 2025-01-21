@@ -31,6 +31,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
   String? riderName;
   String? profileImage;
   String driverId = 'I7FTuyOuTNeo0xkCNjxfT0NBWxF3';
+  Map<String, dynamic>? userData;
+
   @override
   void initState() {
     super.initState();
@@ -40,20 +42,32 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Future<void> fetchUserData() async {
     try {
       User? user = _auth.currentUser;
+      DocumentReference userDoc =
+          FirebaseFirestore.instance.collection('Riders').doc(driverId);
 
-      if (user != null) {
-        DocumentSnapshot userDoc = await FirebaseFirestore.instance
-            .collection('Riders')
-            .doc(user.uid)
-            .get();
-
-        if (userDoc.exists) {
+      userDoc.snapshots().listen((event) {
+        if (event.exists) {
+          final data = event.data() as Map<String, dynamic>;
           setState(() {
-            riderName = userDoc.get('name');
-            profileImage = userDoc.get('profileImage');
+            userData = data;
+            profileImage = event.get('profileImage');
           });
         }
-      }
+      });
+
+      // if (user != null) {
+      //   DocumentSnapshot userDoc = await FirebaseFirestore.instance
+      //       .collection('Riders')
+      //       .doc(user.uid)
+      //       .get();
+
+      //   if (userDoc.exists) {
+      //     setState(() {
+      //       riderName = userDoc.get('name');
+      //       profileImage = userDoc.get('profileImage');
+      //     });
+      //   }
+      // }
     } catch (e) {
       print(e);
     }
@@ -66,7 +80,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         children: [
           Container(
             width: double.infinity,
-            height: 190,
+            height: MediaQuery.of(context).size.height * 0.25,
             decoration: const BoxDecoration(
               color: secondary,
               borderRadius: BorderRadius.only(
@@ -90,7 +104,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           width: 300,
                           child: TextWidget(
                             align: TextAlign.start,
-                            text: 'Good day! Rider $riderName',
+                            text: 'Good day! Rider ${userData!['name']}',
                             fontSize: 22,
                             fontFamily: 'Bold',
                             color: Colors.white,
@@ -220,7 +234,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           padding: const EdgeInsets.only(
                               left: 20, right: 20, bottom: 10),
                           child: Container(
-                            height: 125,
+                            height: MediaQuery.of(context).size.height * 0.18,
                             width: double.infinity,
                             decoration: BoxDecoration(
                               border: Border.all(color: secondary),

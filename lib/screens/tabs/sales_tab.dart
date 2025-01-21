@@ -32,6 +32,7 @@ class _SalesTabState extends State<SalesTab> {
   int orderCount = 0;
   double totalEarned = 0.0;
   String driverId = 'I7FTuyOuTNeo0xkCNjxfT0NBWxF3';
+  Map<String, dynamic>? userData;
 
   @override
   void initState() {
@@ -42,21 +43,34 @@ class _SalesTabState extends State<SalesTab> {
   Future<void> fetchUserData() async {
     try {
       User? user = _auth.currentUser;
+      DocumentReference userDoc =
+          FirebaseFirestore.instance.collection('Riders').doc(user!.uid);
 
-      if (user != null) {
-        DocumentSnapshot userDoc = await FirebaseFirestore.instance
-            .collection('Riders')
-            .doc(user.uid)
-            .get();
-
-        if (userDoc.exists) {
+      userDoc.snapshots().listen((event) {
+        if (event.exists) {
+          final data = event.data() as Map<String, dynamic>;
           setState(() {
-            riderName = userDoc.get('name');
-            profileImage = userDoc.get('profileImage');
+            userData = data;
+            profileImage = data['profileImage'];
           });
           fetchOrderCount();
         }
-      }
+      });
+
+      // if (user != null) {
+      //   DocumentSnapshot userDoc = await FirebaseFirestore.instance
+      //       .collection('Riders')
+      //       .doc(user.uid)
+      //       .get();
+
+      //   if (userDoc.exists) {
+      //     setState(() {
+      //       riderName = userDoc.get('name');
+      //       profileImage = userDoc.get('profileImage');
+      //     });
+      //     fetchOrderCount();
+      //   }
+      // }
     } catch (e) {
       print(e);
     }
@@ -101,7 +115,7 @@ class _SalesTabState extends State<SalesTab> {
           children: [
             Container(
               width: double.infinity,
-              height: 190,
+              height: MediaQuery.of(context).size.height * 0.25,
               decoration: const BoxDecoration(
                 color: secondary,
                 borderRadius: BorderRadius.only(
@@ -126,7 +140,7 @@ class _SalesTabState extends State<SalesTab> {
                             width: 300,
                             child: TextWidget(
                               align: TextAlign.start,
-                              text: 'Good day! Rider $riderName',
+                              text: 'Good day! Rider ${userData?['name']}',
                               fontSize: 22,
                               fontFamily: 'Bold',
                               color: Colors.white,
@@ -271,9 +285,7 @@ class _SalesTabState extends State<SalesTab> {
             //       ),
             //   ],
             // ),
-            // const SizedBox(
-            //   height: 20,
-            // ),
+
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: List.generate(7, (index) {
@@ -284,8 +296,8 @@ class _SalesTabState extends State<SalesTab> {
                     date.month == now.month &&
                     date.year == now.year;
                 return Container(
-                  width: 45,
-                  height: 70,
+                  width: 60,
+                  height: 90,
                   decoration: BoxDecoration(
                     color: isToday ? secondary : Colors.transparent,
                     border: Border.all(
@@ -330,7 +342,7 @@ class _SalesTabState extends State<SalesTab> {
               }),
             ),
             const SizedBox(
-              height: 10,
+              height: 25,
             ),
             StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
