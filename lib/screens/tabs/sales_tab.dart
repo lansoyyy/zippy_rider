@@ -400,7 +400,7 @@ class _SalesTabState extends State<SalesTab> {
                         color: secondary,
                       ),
                       TextWidget(
-                        text: 'total earned this week',
+                        text: 'total earned',
                         fontSize: 18,
                         fontFamily: 'Medium',
                         color: secondary,
@@ -509,51 +509,60 @@ class _SalesTabState extends State<SalesTab> {
                                       height: 10,
                                     ),
                                     Center(
-                                      child: Container(
-                                        height: 65,
-                                        width: 320,
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            color: secondary,
-                                          ),
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(10.0),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            height: 90,
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width -
+                                                40,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                color: secondary,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(10.0),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
-                                                  TextWidget(
-                                                    text: 'Deliver 10 orders',
-                                                    fontSize: 16,
-                                                    fontFamily: 'Bold',
-                                                    color: secondary,
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      TextWidget(
+                                                        text:
+                                                            'Deliver 10 orders',
+                                                        fontSize: 16,
+                                                        fontFamily: 'Bold',
+                                                        color: secondary,
+                                                      ),
+                                                      TextWidget(
+                                                        text: '5/10',
+                                                        fontSize: 16,
+                                                        fontFamily: 'Bold',
+                                                        color: secondary,
+                                                      ),
+                                                    ],
                                                   ),
                                                   TextWidget(
-                                                    text: '5/10',
-                                                    fontSize: 16,
-                                                    fontFamily: 'Bold',
-                                                    color: secondary,
+                                                    text:
+                                                        'Prize: Jollibee food voucher',
+                                                    fontSize: 12,
+                                                    fontFamily: 'Medium',
+                                                    color: Colors.black,
                                                   ),
                                                 ],
                                               ),
-                                              TextWidget(
-                                                text:
-                                                    'Prize: Jollibee food voucher',
-                                                fontSize: 12,
-                                                fontFamily: 'Medium',
-                                                color: Colors.black,
-                                              ),
-                                            ],
+                                            ),
                                           ),
-                                        ),
+                                        ],
                                       ),
                                     ),
                                   ],
