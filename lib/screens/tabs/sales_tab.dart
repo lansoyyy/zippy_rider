@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:zippy/screens/home_screen.dart';
 import 'package:zippy/screens/pages/profile_page.dart';
 import 'package:zippy/screens/tabs/history_tab.dart';
@@ -106,6 +108,11 @@ class _SalesTabState extends State<SalesTab> {
 
   @override
   Widget build(BuildContext context) {
+    DateTime now = DateTime.now();
+
+    // Find the Monday of the current week
+    DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -374,6 +381,13 @@ class _SalesTabState extends State<SalesTab> {
                   // }
 
                   final orders = snapshot.data!.docs;
+
+                  List<SalesData> chartData = List.generate(7, (index) {
+                    DateTime day = startOfWeek.add(Duration(days: index));
+                    double sales =
+                        orders.length.toDouble(); // Example sales data
+                    return SalesData(day, sales);
+                  });
                   double calculatedTotalPrice = 0.0;
                   for (var doc in orders) {
                     final data = doc.data() as Map<String, dynamic>?;
@@ -388,6 +402,9 @@ class _SalesTabState extends State<SalesTab> {
                   if (orders.isEmpty) {
                     return const Center(child: Text('No orders found.'));
                   }
+
+                  // Generate data for the current week (Monday to Sunday)
+
                   return Column(
                     children: [
                       TextWidget(
@@ -405,6 +422,34 @@ class _SalesTabState extends State<SalesTab> {
                       const SizedBox(
                         height: 20,
                       ),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        child: SfCartesianChart(
+                          primaryXAxis: DateTimeAxis(
+                            intervalType:
+                                DateTimeIntervalType.days, // Daily intervals
+                            dateFormat: DateFormat
+                                .E(), // Show short day names (Mon, Tue, etc.)
+                            majorGridLines: const MajorGridLines(
+                                width: 0), // Hide grid lines if needed
+                          ),
+                          primaryYAxis: const NumericAxis(
+                            title: AxisTitle(text: "Bookings"),
+                          ),
+                          series: <CartesianSeries>[
+                            LineSeries<SalesData, DateTime>(
+                              dataSource: chartData,
+                              xValueMapper: (SalesData sales, _) => sales.year,
+                              yValueMapper: (SalesData sales, _) => sales.sales,
+                              color: secondary,
+                              markerSettings: const MarkerSettings(
+                                  isVisible:
+                                      true), // Show markers on data points
+                            ),
+                          ],
+                        ),
+                      ),
+
                       // Container(
                       //   decoration: const BoxDecoration(
                       //     color: secondary,
@@ -597,4 +642,10 @@ class _SalesTabState extends State<SalesTab> {
       ],
     );
   }
+}
+
+class SalesData {
+  SalesData(this.year, this.sales);
+  final DateTime year;
+  final double sales;
 }
