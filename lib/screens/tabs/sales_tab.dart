@@ -5,12 +5,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:zippy/screens/home_screen.dart';
-import 'package:zippy/screens/pages/arrived_page.dart';
 import 'package:zippy/screens/pages/profile_page.dart';
 import 'package:zippy/screens/tabs/history_tab.dart';
-
 import 'package:zippy/utils/colors.dart';
-import 'package:zippy/widgets/button_widget.dart';
 import 'package:zippy/widgets/text_widget.dart';
 
 class SalesTab extends StatefulWidget {
@@ -380,8 +377,8 @@ class _SalesTabState extends State<SalesTab> {
                   double calculatedTotalPrice = 0.0;
                   for (var doc in orders) {
                     final data = doc.data() as Map<String, dynamic>?;
-                    if (data != null && data.containsKey('total')) {
-                      calculatedTotalPrice += data['total'];
+                    if (data != null && data.containsKey('deliveryFee')) {
+                      calculatedTotalPrice += data['deliveryFee'];
                     }
                   }
 
@@ -408,170 +405,170 @@ class _SalesTabState extends State<SalesTab> {
                       const SizedBox(
                         height: 20,
                       ),
-                      Container(
-                        decoration: const BoxDecoration(
-                          color: secondary,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(20),
-                            topRight: Radius.circular(20),
-                          ),
-                        ),
-                        height: MediaQuery.of(context).size.height - 500,
-                        width: double.infinity,
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 20, right: 20, top: 10),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  TextWidget(
-                                    text: orderCount == 1
-                                        ? '1 order'
-                                        : '$orderCount orders',
-                                    fontSize: 40,
-                                    fontFamily: 'Bold',
-                                    color: Colors.white,
-                                  ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      TextWidget(
-                                        text: '15.2%',
-                                        fontSize: 24,
-                                        fontFamily: 'Regular',
-                                        color: Colors.white,
-                                      ),
-                                      TextWidget(
-                                        text: 'higher than last week',
-                                        fontSize: 8,
-                                        fontFamily: 'Regular',
-                                        color: Colors.white,
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Expanded(
-                              child: Container(
-                                width: double.infinity,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(20),
-                                    topRight: Radius.circular(20),
-                                  ),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          20, 10, 20, 10),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              TextWidget(
-                                                text: 'Missions',
-                                                fontSize: 40,
-                                                fontFamily: 'Bold',
-                                                color: secondary,
-                                              ),
-                                              TextWidget(
-                                                text:
-                                                    'complete missions to earn rewards',
-                                                fontSize: 16,
-                                                fontFamily: 'Regular',
-                                                color: secondary,
-                                              ),
-                                            ],
-                                          ),
-                                          Image.asset(
-                                            'assets/images/star.png',
-                                            height: 35,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    Center(
-                                      child: Column(
-                                        children: [
-                                          Container(
-                                            height: 90,
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width -
-                                                40,
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: secondary,
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                            ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(10.0),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      TextWidget(
-                                                        text:
-                                                            'Deliver 10 orders',
-                                                        fontSize: 16,
-                                                        fontFamily: 'Bold',
-                                                        color: secondary,
-                                                      ),
-                                                      TextWidget(
-                                                        text: '5/10',
-                                                        fontSize: 16,
-                                                        fontFamily: 'Bold',
-                                                        color: secondary,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  TextWidget(
-                                                    text:
-                                                        'Prize: Jollibee food voucher',
-                                                    fontSize: 12,
-                                                    fontFamily: 'Medium',
-                                                    color: Colors.black,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      // Container(
+                      //   decoration: const BoxDecoration(
+                      //     color: secondary,
+                      //     borderRadius: BorderRadius.only(
+                      //       topLeft: Radius.circular(20),
+                      //       topRight: Radius.circular(20),
+                      //     ),
+                      //   ),
+                      //   height: MediaQuery.of(context).size.height - 500,
+                      //   width: double.infinity,
+                      //   child: Column(
+                      //     children: [
+                      //       Padding(
+                      //         padding: const EdgeInsets.only(
+                      //             left: 20, right: 20, top: 10),
+                      //         child: Row(
+                      //           mainAxisAlignment:
+                      //               MainAxisAlignment.spaceBetween,
+                      //           children: [
+                      //             TextWidget(
+                      //               text: orderCount == 1
+                      //                   ? '1 order'
+                      //                   : '$orderCount orders',
+                      //               fontSize: 40,
+                      //               fontFamily: 'Bold',
+                      //               color: Colors.white,
+                      //             ),
+                      //             Column(
+                      //               crossAxisAlignment:
+                      //                   CrossAxisAlignment.center,
+                      //               children: [
+                      //                 TextWidget(
+                      //                   text: '15.2%',
+                      //                   fontSize: 24,
+                      //                   fontFamily: 'Regular',
+                      //                   color: Colors.white,
+                      //                 ),
+                      //                 TextWidget(
+                      //                   text: 'higher than last week',
+                      //                   fontSize: 8,
+                      //                   fontFamily: 'Regular',
+                      //                   color: Colors.white,
+                      //                 ),
+                      //               ],
+                      //             ),
+                      //           ],
+                      //         ),
+                      //       ),
+                      //       const SizedBox(
+                      //         height: 10,
+                      //       ),
+                      //       Expanded(
+                      //         child: Container(
+                      //           width: double.infinity,
+                      //           decoration: const BoxDecoration(
+                      //             color: Colors.white,
+                      //             borderRadius: BorderRadius.only(
+                      //               topLeft: Radius.circular(20),
+                      //               topRight: Radius.circular(20),
+                      //             ),
+                      //           ),
+                      //           child: Column(
+                      //             crossAxisAlignment: CrossAxisAlignment.start,
+                      //             children: [
+                      //               Padding(
+                      //                 padding: const EdgeInsets.fromLTRB(
+                      //                     20, 10, 20, 10),
+                      //                 child: Row(
+                      //                   mainAxisAlignment:
+                      //                       MainAxisAlignment.spaceBetween,
+                      //                   children: [
+                      //                     Column(
+                      //                       crossAxisAlignment:
+                      //                           CrossAxisAlignment.start,
+                      //                       children: [
+                      //                         TextWidget(
+                      //                           text: 'Missions',
+                      //                           fontSize: 40,
+                      //                           fontFamily: 'Bold',
+                      //                           color: secondary,
+                      //                         ),
+                      //                         TextWidget(
+                      //                           text:
+                      //                               'complete missions to earn rewards',
+                      //                           fontSize: 16,
+                      //                           fontFamily: 'Regular',
+                      //                           color: secondary,
+                      //                         ),
+                      //                       ],
+                      //                     ),
+                      //                     Image.asset(
+                      //                       'assets/images/star.png',
+                      //                       height: 35,
+                      //                     ),
+                      //                   ],
+                      //                 ),
+                      //               ),
+                      //               const SizedBox(
+                      //                 height: 10,
+                      //               ),
+                      //               Center(
+                      //                 child: Column(
+                      //                   children: [
+                      //                     Container(
+                      //                       height: 90,
+                      //                       width: MediaQuery.of(context)
+                      //                               .size
+                      //                               .width -
+                      //                           40,
+                      //                       decoration: BoxDecoration(
+                      //                         border: Border.all(
+                      //                           color: secondary,
+                      //                         ),
+                      //                         borderRadius:
+                      //                             BorderRadius.circular(20),
+                      //                       ),
+                      //                       child: Padding(
+                      //                         padding:
+                      //                             const EdgeInsets.all(10.0),
+                      //                         child: Column(
+                      //                           crossAxisAlignment:
+                      //                               CrossAxisAlignment.start,
+                      //                           children: [
+                      //                             Row(
+                      //                               mainAxisAlignment:
+                      //                                   MainAxisAlignment
+                      //                                       .spaceBetween,
+                      //                               children: [
+                      //                                 TextWidget(
+                      //                                   text:
+                      //                                       'Deliver 10 orders',
+                      //                                   fontSize: 16,
+                      //                                   fontFamily: 'Bold',
+                      //                                   color: secondary,
+                      //                                 ),
+                      //                                 TextWidget(
+                      //                                   text: '5/10',
+                      //                                   fontSize: 16,
+                      //                                   fontFamily: 'Bold',
+                      //                                   color: secondary,
+                      //                                 ),
+                      //                               ],
+                      //                             ),
+                      //                             TextWidget(
+                      //                               text:
+                      //                                   'Prize: Jollibee food voucher',
+                      //                               fontSize: 12,
+                      //                               fontFamily: 'Medium',
+                      //                               color: Colors.black,
+                      //                             ),
+                      //                           ],
+                      //                         ),
+                      //                       ),
+                      //                     ),
+                      //                   ],
+                      //                 ),
+                      //               ),
+                      //             ],
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
                     ],
                   );
                 })

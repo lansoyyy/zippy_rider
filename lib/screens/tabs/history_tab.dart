@@ -6,12 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:zippy/screens/home_screen.dart';
-import 'package:zippy/screens/pages/completed_page.dart';
 import 'package:zippy/screens/pages/profile_page.dart';
 import 'package:zippy/screens/tabs/sales_tab.dart';
-
 import 'package:zippy/utils/colors.dart';
-import 'package:zippy/widgets/button_widget.dart';
 import 'package:zippy/widgets/text_widget.dart';
 
 class HistoryScreen extends StatefulWidget {
@@ -225,10 +222,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       var order = orders[index];
                       return GestureDetector(
                         onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                                builder: (context) => const CompletedPage()),
-                          );
+                          // Navigator.of(context).push(
+                          //   MaterialPageRoute(
+                          //       builder: (context) => const CompletedPage()),
+                          // );
                         },
                         child: Padding(
                           padding: const EdgeInsets.only(

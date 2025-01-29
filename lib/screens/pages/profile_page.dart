@@ -526,490 +526,500 @@ class _ProfilePageState extends State<ProfilePage> {
                     width: double.infinity,
                     child: Padding(
                       padding: const EdgeInsets.only(left: 30, right: 30),
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 30),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 30),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  TextWidget(
+                                    text: 'EMAIL ADDRESS',
+                                    fontSize: 16,
+                                    color: black,
+                                    fontFamily: 'Regular',
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                TextWidget(
-                                  text: 'EMAIL ADDRESS',
-                                  fontSize: 16,
-                                  color: black,
-                                  fontFamily: 'Regular',
-                                ),
+                                isEmailEditing
+                                    ? Row(
+                                        children: [
+                                          SizedBox(
+                                            width: 200,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  border: InputBorder.none),
+                                              controller: emailController,
+                                              style: const TextStyle(
+                                                color: secondary,
+                                                fontSize: 16,
+                                                fontFamily: 'Medium',
+                                              ),
+                                            ),
+                                          ),
+                                          Row(
+                                            children: [
+                                              IconButton(
+                                                icon: const Icon(
+                                                  Icons.check,
+                                                  color: Colors.green,
+                                                  size: 20,
+                                                ),
+                                                onPressed:
+                                                    updateEmail, // Confirm email update
+                                                padding: EdgeInsets
+                                                    .zero, // Remove default padding
+                                                constraints:
+                                                    const BoxConstraints(), // Remove default constraints
+                                              ),
+                                              IconButton(
+                                                icon: const Icon(
+                                                  Icons.cancel,
+                                                  color: Colors.red,
+                                                  size: 17,
+                                                ),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    isEmailEditing = false;
+                                                    emailController.text =
+                                                        userData![
+                                                            'email']; // Revert changes
+                                                  });
+                                                },
+                                                padding: EdgeInsets
+                                                    .zero, // Remove default padding
+                                                constraints:
+                                                    const BoxConstraints(), // Remove default constraints
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      )
+                                    : GestureDetector(
+                                        onDoubleTap: () {
+                                          setState(() {
+                                            isEmailEditing = true;
+                                            emailController.text =
+                                                userData!['email'];
+                                          });
+                                        },
+                                        child: TextWidget(
+                                          text:
+                                              '${userData?['email']}' ?? '....',
+                                          fontSize: 16,
+                                          color: secondary,
+                                          fontFamily: 'Medium',
+                                        ),
+                                      ),
                               ],
                             ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              isEmailEditing
-                                  ? Row(
-                                      children: [
-                                        SizedBox(
-                                          width: 200,
-                                          child: TextField(
-                                            decoration: const InputDecoration(
-                                                border: InputBorder.none),
-                                            controller: emailController,
-                                            style: const TextStyle(
+                            Divider(color: black),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TextWidget(
+                                      text: 'MOBILE NUMBER',
+                                      fontSize: 16,
+                                      color: black,
+                                      fontFamily: 'Regular',
+                                    ),
+                                    isNumEditing
+                                        ? Row(
+                                            children: [
+                                              SizedBox(
+                                                width: 200,
+                                                child: TextField(
+                                                  maxLength: 11,
+                                                  keyboardType:
+                                                      const TextInputType
+                                                          .numberWithOptions(),
+                                                  decoration:
+                                                      const InputDecoration(
+                                                          border:
+                                                              InputBorder.none),
+                                                  controller: numberController,
+                                                  style: const TextStyle(
+                                                    color: secondary,
+                                                    fontSize: 16,
+                                                    fontFamily: 'Medium',
+                                                  ),
+                                                ),
+                                              ),
+                                              IconButton(
+                                                icon: const Icon(
+                                                  Icons.check,
+                                                  color: Colors.green,
+                                                  size: 20,
+                                                ),
+                                                onPressed:
+                                                    updateNumber, // Confirm number update
+                                              ),
+                                              const Padding(
+                                                  padding: EdgeInsets.zero),
+                                              IconButton(
+                                                icon: const Icon(Icons.cancel,
+                                                    color: Colors.red,
+                                                    size: 17),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    isNumEditing = false;
+                                                    numberController.text =
+                                                        userData![
+                                                            'number']; // Revert changes
+                                                  });
+                                                },
+                                              ),
+                                            ],
+                                          )
+                                        : GestureDetector(
+                                            onDoubleTap: () => setState(() {
+                                              isNumEditing = true;
+                                              numberController.text =
+                                                  userData!['number'];
+                                            }),
+                                            child: TextWidget(
+                                              text: '${userData?['number']}' ??
+                                                  '....',
+                                              fontSize: 14,
                                               color: secondary,
-                                              fontSize: 16,
                                               fontFamily: 'Medium',
                                             ),
                                           ),
-                                        ),
-                                        Row(
-                                          children: [
-                                            IconButton(
-                                              icon: const Icon(
-                                                Icons.check,
-                                                color: Colors.green,
-                                                size: 20,
+                                  ],
+                                ),
+                              ],
+                            ),
+                            Divider(color: black),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TextWidget(
+                                      text: 'BIRTHDATE',
+                                      fontSize: 16,
+                                      color: black,
+                                      fontFamily: 'Regular',
+                                    ),
+                                    isBdayEditing
+                                        ? Row(
+                                            children: [
+                                              SizedBox(
+                                                width: 200,
+                                                child: TextField(
+                                                  decoration:
+                                                      const InputDecoration(
+                                                          border:
+                                                              InputBorder.none),
+                                                  controller: bdayController,
+                                                  style: const TextStyle(
+                                                    color: secondary,
+                                                    fontSize: 16,
+                                                    fontFamily: 'Medium',
+                                                  ),
+                                                ),
                                               ),
-                                              onPressed:
-                                                  updateEmail, // Confirm email update
-                                              padding: EdgeInsets
-                                                  .zero, // Remove default padding
-                                              constraints:
-                                                  const BoxConstraints(), // Remove default constraints
-                                            ),
-                                            IconButton(
-                                              icon: const Icon(
-                                                Icons.cancel,
-                                                color: Colors.red,
-                                                size: 17,
+                                              IconButton(
+                                                icon: const Icon(
+                                                  Icons.check,
+                                                  color: Colors.green,
+                                                  size: 20,
+                                                ),
+                                                onPressed:
+                                                    updateBday, // Confirm number update
                                               ),
-                                              onPressed: () {
-                                                setState(() {
-                                                  isEmailEditing = false;
-                                                  emailController.text = userData![
-                                                      'email']; // Revert changes
-                                                });
-                                              },
-                                              padding: EdgeInsets
-                                                  .zero, // Remove default padding
-                                              constraints:
-                                                  const BoxConstraints(), // Remove default constraints
+                                              const Padding(
+                                                  padding: EdgeInsets.zero),
+                                              IconButton(
+                                                icon: const Icon(Icons.cancel,
+                                                    color: Colors.red,
+                                                    size: 17),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    isBdayEditing = false;
+                                                    bdayController.text = userData![
+                                                        'bday']; // Revert changes
+                                                  });
+                                                },
+                                              ),
+                                            ],
+                                          )
+                                        : GestureDetector(
+                                            onDoubleTap: () => setState(() {
+                                              isBdayEditing = true;
+                                              bdayController.text =
+                                                  userData!['bday'];
+                                            }),
+                                            child: TextWidget(
+                                              text: '${userData?['bday']}' ??
+                                                  '....',
+                                              fontSize: 16,
+                                              color: secondary,
+                                              fontFamily: 'Medium',
                                             ),
-                                          ],
-                                        ),
-                                      ],
-                                    )
-                                  : GestureDetector(
-                                      onDoubleTap: () {
-                                        setState(() {
-                                          isEmailEditing = true;
-                                          emailController.text =
-                                              userData!['email'];
-                                        });
-                                      },
+                                          ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            Divider(color: black),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TextWidget(
+                                      text: 'Address',
+                                      fontSize: 16,
+                                      color: black,
+                                      fontFamily: 'Regular',
+                                    ),
+                                    isAddEditing
+                                        ? Row(
+                                            children: [
+                                              SizedBox(
+                                                width: 200,
+                                                child: TextField(
+                                                  decoration:
+                                                      const InputDecoration(
+                                                          border:
+                                                              InputBorder.none),
+                                                  controller: addController,
+                                                  style: const TextStyle(
+                                                    color: secondary,
+                                                    fontSize: 16,
+                                                    fontFamily: 'Medium',
+                                                  ),
+                                                ),
+                                              ),
+                                              IconButton(
+                                                icon: const Icon(
+                                                  Icons.check,
+                                                  color: Colors.green,
+                                                  size: 20,
+                                                ),
+                                                onPressed:
+                                                    updateAdd, // Confirm number update
+                                              ),
+                                              const Padding(
+                                                  padding: EdgeInsets.zero),
+                                              IconButton(
+                                                icon: const Icon(Icons.cancel,
+                                                    color: Colors.red,
+                                                    size: 17),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    isAddEditing = false;
+                                                    addController.text = userData![
+                                                        'address']; // Revert changes
+                                                  });
+                                                },
+                                              ),
+                                            ],
+                                          )
+                                        : GestureDetector(
+                                            onDoubleTap: () => setState(() {
+                                              isAddEditing = true;
+                                              addController.text =
+                                                  userData!['address'];
+                                            }),
+                                            child: TextWidget(
+                                              text: '${userData?['address']}' ??
+                                                  '....',
+                                              fontSize: 16,
+                                              color: secondary,
+                                              fontFamily: 'Medium',
+                                            ),
+                                          ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            Divider(color: black),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TextWidget(
+                                      text: 'Vehicle Model',
+                                      fontSize: 16,
+                                      color: black,
+                                      fontFamily: 'Regular',
+                                    ),
+                                    isVehEditing
+                                        ? Row(
+                                            children: [
+                                              SizedBox(
+                                                width: 200,
+                                                child: TextField(
+                                                  decoration:
+                                                      const InputDecoration(
+                                                          border:
+                                                              InputBorder.none),
+                                                  controller: vehController,
+                                                  style: const TextStyle(
+                                                    color: secondary,
+                                                    fontSize: 16,
+                                                    fontFamily: 'Medium',
+                                                  ),
+                                                ),
+                                              ),
+                                              IconButton(
+                                                icon: const Icon(
+                                                  Icons.check,
+                                                  color: Colors.green,
+                                                  size: 20,
+                                                ),
+                                                onPressed:
+                                                    updateVeh, // Confirm number update
+                                              ),
+                                              const Padding(
+                                                  padding: EdgeInsets.zero),
+                                              IconButton(
+                                                icon: const Icon(Icons.cancel,
+                                                    color: Colors.red,
+                                                    size: 17),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    isVehEditing = false;
+                                                    vehController.text = userData![
+                                                        'vehicleModel']; // Revert changes
+                                                  });
+                                                },
+                                              ),
+                                            ],
+                                          )
+                                        : GestureDetector(
+                                            onDoubleTap: () => setState(() {
+                                              isVehEditing = true;
+                                              vehController.text =
+                                                  userData!['vehicleModel'];
+                                            }),
+                                            child: TextWidget(
+                                              text:
+                                                  '${userData?['vehicleModel']}' ??
+                                                      '....',
+                                              fontSize: 16,
+                                              color: secondary,
+                                              fontFamily: 'Medium',
+                                            ),
+                                          ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            Divider(color: black),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TextWidget(
+                                      text: 'Plate Number',
+                                      fontSize: 16,
+                                      color: black,
+                                      fontFamily: 'Regular',
+                                    ),
+                                    SizedBox(
                                       child: TextWidget(
-                                        text: '${userData?['email']}' ?? '....',
+                                        align: TextAlign.start,
+                                        text: '${userData?['plateNumber']}',
                                         fontSize: 16,
                                         color: secondary,
                                         fontFamily: 'Medium',
                                       ),
                                     ),
-                            ],
-                          ),
-                          Divider(color: black),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  TextWidget(
-                                    text: 'MOBILE NUMBER',
-                                    fontSize: 16,
-                                    color: black,
-                                    fontFamily: 'Regular',
-                                  ),
-                                  isNumEditing
-                                      ? Row(
-                                          children: [
-                                            SizedBox(
-                                              width: 200,
-                                              child: TextField(
-                                                maxLength: 11,
-                                                keyboardType:
-                                                    const TextInputType
-                                                        .numberWithOptions(),
-                                                decoration:
-                                                    const InputDecoration(
-                                                        border:
-                                                            InputBorder.none),
-                                                controller: numberController,
-                                                style: const TextStyle(
-                                                  color: secondary,
-                                                  fontSize: 16,
-                                                  fontFamily: 'Medium',
-                                                ),
-                                              ),
-                                            ),
-                                            IconButton(
-                                              icon: const Icon(
-                                                Icons.check,
-                                                color: Colors.green,
-                                                size: 20,
-                                              ),
-                                              onPressed:
-                                                  updateNumber, // Confirm number update
-                                            ),
-                                            const Padding(
-                                                padding: EdgeInsets.zero),
-                                            IconButton(
-                                              icon: const Icon(Icons.cancel,
-                                                  color: Colors.red, size: 17),
-                                              onPressed: () {
-                                                setState(() {
-                                                  isNumEditing = false;
-                                                  numberController.text = userData![
-                                                      'number']; // Revert changes
-                                                });
-                                              },
-                                            ),
-                                          ],
-                                        )
-                                      : GestureDetector(
-                                          onDoubleTap: () => setState(() {
-                                            isNumEditing = true;
-                                            numberController.text =
-                                                userData!['number'];
-                                          }),
-                                          child: TextWidget(
-                                            text: '${userData?['number']}' ??
-                                                '....',
-                                            fontSize: 14,
-                                            color: secondary,
-                                            fontFamily: 'Medium',
-                                          ),
-                                        ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Divider(color: black),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  TextWidget(
-                                    text: 'BIRTHDATE',
-                                    fontSize: 16,
-                                    color: black,
-                                    fontFamily: 'Regular',
-                                  ),
-                                  isBdayEditing
-                                      ? Row(
-                                          children: [
-                                            SizedBox(
-                                              width: 200,
-                                              child: TextField(
-                                                decoration:
-                                                    const InputDecoration(
-                                                        border:
-                                                            InputBorder.none),
-                                                controller: bdayController,
-                                                style: const TextStyle(
-                                                  color: secondary,
-                                                  fontSize: 16,
-                                                  fontFamily: 'Medium',
-                                                ),
-                                              ),
-                                            ),
-                                            IconButton(
-                                              icon: const Icon(
-                                                Icons.check,
-                                                color: Colors.green,
-                                                size: 20,
-                                              ),
-                                              onPressed:
-                                                  updateBday, // Confirm number update
-                                            ),
-                                            const Padding(
-                                                padding: EdgeInsets.zero),
-                                            IconButton(
-                                              icon: const Icon(Icons.cancel,
-                                                  color: Colors.red, size: 17),
-                                              onPressed: () {
-                                                setState(() {
-                                                  isBdayEditing = false;
-                                                  bdayController.text = userData![
-                                                      'bday']; // Revert changes
-                                                });
-                                              },
-                                            ),
-                                          ],
-                                        )
-                                      : GestureDetector(
-                                          onDoubleTap: () => setState(() {
-                                            isBdayEditing = true;
-                                            bdayController.text =
-                                                userData!['bday'];
-                                          }),
-                                          child: TextWidget(
-                                            text: '${userData?['bday']}' ??
-                                                '....',
-                                            fontSize: 16,
-                                            color: secondary,
-                                            fontFamily: 'Medium',
-                                          ),
-                                        ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Divider(color: black),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  TextWidget(
-                                    text: 'Address',
-                                    fontSize: 16,
-                                    color: black,
-                                    fontFamily: 'Regular',
-                                  ),
-                                  isAddEditing
-                                      ? Row(
-                                          children: [
-                                            SizedBox(
-                                              width: 200,
-                                              child: TextField(
-                                                decoration:
-                                                    const InputDecoration(
-                                                        border:
-                                                            InputBorder.none),
-                                                controller: addController,
-                                                style: const TextStyle(
-                                                  color: secondary,
-                                                  fontSize: 16,
-                                                  fontFamily: 'Medium',
-                                                ),
-                                              ),
-                                            ),
-                                            IconButton(
-                                              icon: const Icon(
-                                                Icons.check,
-                                                color: Colors.green,
-                                                size: 20,
-                                              ),
-                                              onPressed:
-                                                  updateAdd, // Confirm number update
-                                            ),
-                                            const Padding(
-                                                padding: EdgeInsets.zero),
-                                            IconButton(
-                                              icon: const Icon(Icons.cancel,
-                                                  color: Colors.red, size: 17),
-                                              onPressed: () {
-                                                setState(() {
-                                                  isAddEditing = false;
-                                                  addController.text = userData![
-                                                      'address']; // Revert changes
-                                                });
-                                              },
-                                            ),
-                                          ],
-                                        )
-                                      : GestureDetector(
-                                          onDoubleTap: () => setState(() {
-                                            isAddEditing = true;
-                                            addController.text =
-                                                userData!['address'];
-                                          }),
-                                          child: TextWidget(
-                                            text: '${userData?['address']}' ??
-                                                '....',
-                                            fontSize: 16,
-                                            color: secondary,
-                                            fontFamily: 'Medium',
-                                          ),
-                                        ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Divider(color: black),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  TextWidget(
-                                    text: 'Vehicle Model',
-                                    fontSize: 16,
-                                    color: black,
-                                    fontFamily: 'Regular',
-                                  ),
-                                  isVehEditing
-                                      ? Row(
-                                          children: [
-                                            SizedBox(
-                                              width: 200,
-                                              child: TextField(
-                                                decoration:
-                                                    const InputDecoration(
-                                                        border:
-                                                            InputBorder.none),
-                                                controller: vehController,
-                                                style: const TextStyle(
-                                                  color: secondary,
-                                                  fontSize: 16,
-                                                  fontFamily: 'Medium',
-                                                ),
-                                              ),
-                                            ),
-                                            IconButton(
-                                              icon: const Icon(
-                                                Icons.check,
-                                                color: Colors.green,
-                                                size: 20,
-                                              ),
-                                              onPressed:
-                                                  updateVeh, // Confirm number update
-                                            ),
-                                            const Padding(
-                                                padding: EdgeInsets.zero),
-                                            IconButton(
-                                              icon: const Icon(Icons.cancel,
-                                                  color: Colors.red, size: 17),
-                                              onPressed: () {
-                                                setState(() {
-                                                  isVehEditing = false;
-                                                  vehController.text = userData![
-                                                      'vehicleModel']; // Revert changes
-                                                });
-                                              },
-                                            ),
-                                          ],
-                                        )
-                                      : GestureDetector(
-                                          onDoubleTap: () => setState(() {
-                                            isVehEditing = true;
-                                            vehController.text =
-                                                userData!['vehicleModel'];
-                                          }),
-                                          child: TextWidget(
-                                            text:
-                                                '${userData?['vehicleModel']}' ??
-                                                    '....',
-                                            fontSize: 16,
-                                            color: secondary,
-                                            fontFamily: 'Medium',
-                                          ),
-                                        ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Divider(color: black),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  TextWidget(
-                                    text: 'Plate Number',
-                                    fontSize: 16,
-                                    color: black,
-                                    fontFamily: 'Regular',
-                                  ),
-                                  SizedBox(
-                                    child: TextWidget(
-                                      align: TextAlign.start,
-                                      text: '${userData?['plateNumber']}',
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TextWidget(
+                                      text: 'Registration No.',
                                       fontSize: 16,
-                                      color: secondary,
-                                      fontFamily: 'Medium',
+                                      color: black,
+                                      fontFamily: 'Regular',
                                     ),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  TextWidget(
-                                    text: 'Registration No.',
-                                    fontSize: 16,
-                                    color: black,
-                                    fontFamily: 'Regular',
-                                  ),
-                                  SizedBox(
-                                    child: TextWidget(
-                                      align: TextAlign.start,
-                                      text:
-                                          '${userData?['registrationNumber']}',
+                                    SizedBox(
+                                      child: TextWidget(
+                                        align: TextAlign.start,
+                                        text:
+                                            '${userData?['registrationNumber']}',
+                                        fontSize: 16,
+                                        color: secondary,
+                                        fontFamily: 'Medium',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            Divider(color: black),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TextWidget(
+                                      text: 'License No.',
                                       fontSize: 16,
-                                      color: secondary,
-                                      fontFamily: 'Medium',
+                                      color: black,
+                                      fontFamily: 'Regular',
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Divider(color: black),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  TextWidget(
-                                    text: 'License No.',
-                                    fontSize: 16,
-                                    color: black,
-                                    fontFamily: 'Regular',
-                                  ),
-                                  SizedBox(
-                                    child: TextWidget(
-                                      align: TextAlign.start,
-                                      text: '${userData?['licenseNumber']}',
+                                    SizedBox(
+                                      child: TextWidget(
+                                        align: TextAlign.start,
+                                        text: '${userData?['licenseNumber']}',
+                                        fontSize: 16,
+                                        color: secondary,
+                                        fontFamily: 'Medium',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TextWidget(
+                                      text: 'Expiry',
                                       fontSize: 16,
-                                      color: secondary,
-                                      fontFamily: 'Medium',
+                                      color: black,
+                                      fontFamily: 'Regular',
                                     ),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  TextWidget(
-                                    text: 'Expiry',
-                                    fontSize: 16,
-                                    color: black,
-                                    fontFamily: 'Regular',
-                                  ),
-                                  SizedBox(
-                                    child: TextWidget(
-                                      align: TextAlign.start,
-                                      text: '${userData?['expiry']}',
-                                      fontSize: 14,
-                                      color: secondary,
-                                      fontFamily: 'Medium',
+                                    SizedBox(
+                                      child: TextWidget(
+                                        align: TextAlign.start,
+                                        text: '${userData?['expiry']}',
+                                        fontSize: 14,
+                                        color: secondary,
+                                        fontFamily: 'Medium',
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ],
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
