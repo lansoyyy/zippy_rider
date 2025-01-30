@@ -20,29 +20,6 @@ class _InitialHomeScreenState extends State<InitialHomeScreen> {
   @override
   void initState() {
     super.initState();
-    fetchUserData();
-  }
-
-  Future<void> fetchUserData() async {
-    try {
-      User? user = _auth.currentUser;
-
-      if (user != null) {
-        DocumentSnapshot userDoc = await FirebaseFirestore.instance
-            .collection('Riders')
-            .doc(user.uid)
-            .get();
-
-        if (userDoc.exists) {
-          final data = userDoc.data() as Map<String, dynamic>;
-          setState(() {
-            userData = data;
-          });
-        }
-      }
-    } catch (e) {
-      print(e);
-    }
   }
 
   @override
@@ -69,33 +46,60 @@ class _InitialHomeScreenState extends State<InitialHomeScreen> {
               child: Align(
                 alignment: Alignment.topRight,
                 child: Container(
-                  width: 250,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: secondary, width: 1),
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(
-                        10,
-                      ),
-                      topRight: Radius.circular(
-                        10,
-                      ),
-                      bottomRight: Radius.circular(
-                        10,
+                    width: 250,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: secondary, width: 1),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(
+                          10,
+                        ),
+                        topRight: Radius.circular(
+                          10,
+                        ),
+                        bottomRight: Radius.circular(
+                          10,
+                        ),
                       ),
                     ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: TextWidget(
-                        color: secondary,
-                        fontFamily: 'Medium',
-                        maxLines: 5,
-                        text:
-                            'Hi! Rider ${userData?['name'] ?? '...'}. Ready to start your Zippy journey?',
-                        fontSize: 16),
-                  ),
-                ),
+                    child: StreamBuilder<DocumentSnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection('Riders')
+                            .doc(_auth.currentUser?.uid)
+                            .snapshots(),
+                        builder: (context,
+                            AsyncSnapshot<DocumentSnapshot> snapshot) {
+                          if (!snapshot.hasData) {
+                            return const Center(
+                                child:
+                                    Center(child: CircularProgressIndicator()));
+                          } else if (snapshot.hasError) {
+                            return const Center(
+                                child: Text('Something went wrong'));
+                          } else if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child:
+                                    Center(child: CircularProgressIndicator()));
+                          }
+
+                          final data =
+                              snapshot.data!.data() as Map<String, dynamic>?;
+
+                          if (data == null) {
+                            return const Center(child: Text('No data found.'));
+                          }
+                          return Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: TextWidget(
+                                color: secondary,
+                                fontFamily: 'Medium',
+                                maxLines: 5,
+                                text:
+                                    'Hi! Rider,${data['name'] ?? '...'}. Ready to start your Zippy journey?',
+                                fontSize: 16),
+                          );
+                        })),
               ),
             ),
             Align(

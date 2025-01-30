@@ -128,37 +128,69 @@ class _HomeScreenState extends State<HomeScreen> {
                 Padding(
                   padding: const EdgeInsets.only(top: 25, left: 15, right: 15),
                   child: SafeArea(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(
-                          width: 300,
-                          child: TextWidget(
-                            align: TextAlign.left,
-                            text: 'Good Day! Rider ${userData!['name']}',
-                            fontSize: 22,
-                            fontFamily: 'Bold',
-                            color: Colors.white,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (context) => const ProfilePage()),
+                      child: StreamBuilder<DocumentSnapshot>(
+                          stream: FirebaseFirestore.instance
+                              .collection('Riders')
+                              .doc(_auth.currentUser?.uid)
+                              .snapshots(),
+                          builder: (context,
+                              AsyncSnapshot<DocumentSnapshot> snapshot) {
+                            if (!snapshot.hasData) {
+                              return const Center(
+                                  child: Center(
+                                      child: CircularProgressIndicator()));
+                            } else if (snapshot.hasError) {
+                              return const Center(
+                                  child: Text('Something went wrong'));
+                            } else if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                  child: Center(
+                                      child: CircularProgressIndicator()));
+                            }
+
+                            final data =
+                                snapshot.data!.data() as Map<String, dynamic>?;
+
+                            if (data == null) {
+                              return const Center(
+                                  child: Text('No data found.'));
+                            }
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SizedBox(
+                                  width: 300,
+                                  child: TextWidget(
+                                    align: TextAlign.start,
+                                    text: 'Good day! Rider ${data['name']}',
+                                    fontSize: 20,
+                                    fontFamily: 'Bold',
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const ProfilePage()),
+                                    );
+                                  },
+                                  child: CircleAvatar(
+                                    maxRadius: 25,
+                                    minRadius: 25,
+                                    backgroundImage: data['profileImage'] !=
+                                            null
+                                        ? NetworkImage(profileImage ??
+                                            'https://cdn-icons-png.flaticon.com/256/149/149071.png')
+                                        : const NetworkImage(
+                                            'https://cdn-icons-png.flaticon.com/256/149/149071.png'),
+                                  ),
+                                ),
+                              ],
                             );
-                          },
-                          child: CircleAvatar(
-                            maxRadius: 25,
-                            minRadius: 25,
-                            backgroundImage: profileImage != null
-                                ? NetworkImage(profileImage!)
-                                : null,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                          })),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(left: 15, right: 15, top: 15),
