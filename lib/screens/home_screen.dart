@@ -4,11 +4,15 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:zippy/screens/pages/profile_page.dart';
 import 'package:zippy/screens/tabs/history_tab.dart';
 import 'package:zippy/screens/tabs/sales_tab.dart';
 import 'package:zippy/utils/colors.dart';
+import 'package:zippy/utils/const.dart';
+import 'package:zippy/utils/my_location.dart';
 import 'package:zippy/widgets/button_widget.dart';
 import 'package:zippy/widgets/text_widget.dart';
 
@@ -39,7 +43,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    determinePosition();
     fetchUserData();
+
+    getCurrentLocation();
   }
 
   Future<void> fetchUserData() async {
@@ -63,178 +70,275 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  void dispose() {
+    mapController!.dispose();
+    super.dispose();
+  }
+
+  getCurrentLocation() async {
+    await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
+        .then(
+      (value) {
+        setState(() {
+          mylat = value.latitude;
+          mylng = value.longitude;
+        });
+      },
+    ).whenComplete(
+      () {
+        setState(() {
+          hasLoaded = true;
+        });
+      },
+    );
+  }
+
+  late Polyline _poly = const Polyline(polylineId: PolylineId('new'));
+
+  List<LatLng> polylineCoordinates = [];
+  PolylinePoints polylinePoints = PolylinePoints();
+
+  plotPloylines(double merchantLat, double merchantLng) async {
+    Timer.periodic(
+      const Duration(seconds: 10),
+      (timer) async {
+        await Geolocator.getCurrentPosition(
+                desiredAccuracy: LocationAccuracy.high)
+            .then(
+          (value) async {
+            PolylineResult result =
+                await polylinePoints.getRouteBetweenCoordinates(
+                    kGoogleApiKey,
+                    PointLatLng(value.latitude, value.longitude),
+                    PointLatLng(merchantLat, merchantLng));
+            if (result.points.isNotEmpty) {
+              polylineCoordinates = result.points
+                  .map((point) => LatLng(point.latitude, point.longitude))
+                  .toList();
+            }
+            setState(() {
+              markers.clear();
+              _poly = Polyline(
+                  color: Colors.red,
+                  polylineId: const PolylineId('route'),
+                  points: polylineCoordinates,
+                  width: 4);
+
+              mylat = value.latitude;
+              mylng = value.longitude;
+
+              markers.add(Marker(
+                  draggable: true,
+                  icon: BitmapDescriptor.defaultMarker,
+                  markerId: const MarkerId("pickup"),
+                  position: LatLng(merchantLat, merchantLng),
+                  infoWindow: const InfoWindow(title: "Merchant's Location")));
+            });
+          },
+        );
+      },
+    );
+  }
+
+  double mylat = 0;
+  double mylng = 0;
+
+  bool hasLoaded = false;
+
+  Set<Marker> markers = {};
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Expanded(
-            child: GoogleMap(
-              zoomControlsEnabled: false,
-              mapType: MapType.normal,
-              myLocationEnabled: true,
-              myLocationButtonEnabled: true,
-              initialCameraPosition: HomeScreen._kGooglePlex,
-              onMapCreated: (GoogleMapController controller) {
-                _controller.complete(controller);
-              },
-            ),
-          ),
-          Container(
-            width: double.infinity,
-            height: MediaQuery.of(context).size.height * 0.25,
-            decoration: const BoxDecoration(
-              color: secondary,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(
-                  40,
-                ),
-                bottomRight: Radius.circular(
-                  40,
-                ),
-              ),
-            ),
-            child: Column(
+      body: hasLoaded
+          ? Stack(
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 25, left: 15, right: 15),
-                  child: SafeArea(
-                      child: StreamBuilder<DocumentSnapshot>(
-                          stream: FirebaseFirestore.instance
-                              .collection('Riders')
-                              .doc(_auth.currentUser?.uid)
-                              .snapshots(),
-                          builder: (context,
-                              AsyncSnapshot<DocumentSnapshot> snapshot) {
-                            if (!snapshot.hasData) {
-                              return const Center(
-                                  child: Center(
-                                      child: CircularProgressIndicator()));
-                            } else if (snapshot.hasError) {
-                              return const Center(
-                                  child: Text('Something went wrong'));
-                            } else if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const Center(
-                                  child: Center(
-                                      child: CircularProgressIndicator()));
-                            }
+                Expanded(
+                  child: GoogleMap(
+                    polylines: {_poly},
+                    zoomControlsEnabled: false,
+                    mapType: MapType.normal,
+                    myLocationButtonEnabled: true,
+                    myLocationEnabled: true,
+                    markers: markers,
+                    initialCameraPosition: HomeScreen._kGooglePlex,
+                    onMapCreated: (GoogleMapController controller) {
+                      mapController = controller;
+                      _controller.complete(controller);
+                    },
+                  ),
+                ),
+                Container(
+                  width: double.infinity,
+                  height: MediaQuery.of(context).size.height * 0.25,
+                  decoration: const BoxDecoration(
+                    color: secondary,
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(
+                        40,
+                      ),
+                      bottomRight: Radius.circular(
+                        40,
+                      ),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding:
+                            const EdgeInsets.only(top: 25, left: 15, right: 15),
+                        child: SafeArea(
+                            child: StreamBuilder<DocumentSnapshot>(
+                                stream: FirebaseFirestore.instance
+                                    .collection('Riders')
+                                    .doc(_auth.currentUser?.uid)
+                                    .snapshots(),
+                                builder: (context,
+                                    AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                  if (!snapshot.hasData) {
+                                    return const Center(
+                                        child: Center(
+                                            child:
+                                                CircularProgressIndicator()));
+                                  } else if (snapshot.hasError) {
+                                    return const Center(
+                                        child: Text('Something went wrong'));
+                                  } else if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const Center(
+                                        child: Center(
+                                            child:
+                                                CircularProgressIndicator()));
+                                  }
 
-                            final data =
-                                snapshot.data!.data() as Map<String, dynamic>?;
+                                  final data = snapshot.data!.data()
+                                      as Map<String, dynamic>?;
 
-                            if (data == null) {
-                              return const Center(
-                                  child: Text('No data found.'));
-                            }
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  if (data == null) {
+                                    return const Center(
+                                        child: Text('No data found.'));
+                                  }
+                                  return Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      SizedBox(
+                                        width: 300,
+                                        child: TextWidget(
+                                          align: TextAlign.start,
+                                          text:
+                                              'Good day! Rider ${data['name']}',
+                                          fontSize: 20,
+                                          fontFamily: 'Bold',
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const ProfilePage()),
+                                          );
+                                        },
+                                        child: CircleAvatar(
+                                          maxRadius: 25,
+                                          minRadius: 25,
+                                          backgroundImage: data[
+                                                      'profileImage'] !=
+                                                  null
+                                              ? NetworkImage(profileImage ??
+                                                  'https://cdn-icons-png.flaticon.com/256/149/149071.png')
+                                              : const NetworkImage(
+                                                  'https://cdn-icons-png.flaticon.com/256/149/149071.png'),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                })),
+                      ),
+                      Padding(
+                        padding:
+                            const EdgeInsets.only(left: 15, right: 15, top: 15),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
-                                SizedBox(
-                                  width: 300,
-                                  child: TextWidget(
-                                    align: TextAlign.start,
-                                    text: 'Good day! Rider ${data['name']}',
-                                    fontSize: 20,
-                                    fontFamily: 'Bold',
-                                    color: Colors.white,
-                                  ),
-                                ),
+                                GestureDetector(
+                                    onTap: () {},
+                                    child: _buildCravingOption(
+                                        Icons.home, 'Home', true)),
                                 GestureDetector(
                                   onTap: () {
-                                    Navigator.of(context).push(
+                                    Navigator.of(context).pushReplacement(
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              const ProfilePage()),
+                                              const SalesTab()),
                                     );
                                   },
-                                  child: CircleAvatar(
-                                    maxRadius: 25,
-                                    minRadius: 25,
-                                    backgroundImage: data['profileImage'] !=
-                                            null
-                                        ? NetworkImage(profileImage ??
-                                            'https://cdn-icons-png.flaticon.com/256/149/149071.png')
-                                        : const NetworkImage(
-                                            'https://cdn-icons-png.flaticon.com/256/149/149071.png'),
-                                  ),
+                                  child: _buildCravingOption(
+                                      Icons.add_chart_rounded, 'Sales', false),
                                 ),
+                                GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context).pushReplacement(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const HistoryScreen()),
+                                      );
+                                    },
+                                    child: _buildCravingOption(
+                                        Icons.history, 'History', false)),
                               ],
-                            );
-                          })),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 15, right: 15, top: 15),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          GestureDetector(
-                              onTap: () {},
-                              child: _buildCravingOption(
-                                  Icons.home, 'Home', true)),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                    builder: (context) => const SalesTab()),
-                              );
-                            },
-                            child: _buildCravingOption(
-                                Icons.add_chart_rounded, 'Sales', false),
-                          ),
-                          GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const HistoryScreen()),
-                                );
-                              },
-                              child: _buildCravingOption(
-                                  Icons.history, 'History', false)),
-                        ],
-                      ),
+                            ),
+                          ],
+                        ),
+                      )
                     ],
                   ),
-                )
+                ),
+                Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Container(
+                    height: 90,
+                    width: double.infinity,
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(
+                          20,
+                        ),
+                        topRight: Radius.circular(
+                          20,
+                        ),
+                      ),
+                      color: Colors.white,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: ButtonWidget(
+                        color: secondary,
+                        label: hasAccepted
+                            ? 'Preparing Food...'
+                            : 'Search Bookings',
+                        onPressed: () {
+                          if (hasAccepted) {
+                          } else {
+                            showOrderListDialog();
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ),
               ],
-            ),
-          ),
-          Align(
-            alignment: Alignment.bottomLeft,
-            child: Container(
-              height: 90,
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(
-                    20,
-                  ),
-                  topRight: Radius.circular(
-                    20,
-                  ),
-                ),
-                color: Colors.white,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: ButtonWidget(
-                  color: secondary,
-                  label: hasAccepted ? 'Preparing Food...' : 'Search Bookings',
-                  onPressed: () {
-                    if (hasAccepted) {
-                    } else {
-                      showOrderListDialog();
-                    }
-                  },
-                ),
+            )
+          : const Center(
+              child: CircularProgressIndicator(
+                color: secondary,
               ),
             ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -648,13 +752,23 @@ class _HomeScreenState extends State<HomeScreen> {
                         borderRadius: BorderRadius.circular(10)),
                     child: GestureDetector(
                       onTap: () async {
+                        final merchant = await FirebaseFirestore.instance
+                            .collection('Merchant')
+                            .doc(randomOrder['merchantId'])
+                            .get();
                         await FirebaseFirestore.instance
                             .collection('Riders')
                             .doc(driverId)
                             .update({'isActive': false});
+
+                        mapController!.animateCamera(CameraUpdate.newLatLngZoom(
+                            LatLng(merchant['lat'], merchant['lng']), 18.0));
+
+                        plotPloylines(merchant['lat'], merchant['lng']);
                         setState(() {
                           hasAccepted = true;
                         });
+
                         Navigator.of(context).pop();
                         Navigator.of(context).pop();
                       },
@@ -672,6 +786,8 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         });
   }
+
+  GoogleMapController? mapController;
 
   bool hasAccepted = false;
 
