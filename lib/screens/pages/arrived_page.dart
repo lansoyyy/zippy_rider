@@ -5,7 +5,9 @@ import 'package:zippy/widgets/button_widget.dart';
 import 'package:zippy/widgets/text_widget.dart';
 
 class ArrivedPage extends StatelessWidget {
-  const ArrivedPage({super.key});
+  dynamic orderData;
+
+  ArrivedPage({super.key, required this.orderData});
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +131,7 @@ class ArrivedPage extends StatelessWidget {
                 height: 30,
               ),
               ButtonWidget(
-                label: 'Order Received',
+                label: 'Go to Home',
                 onPressed: () {
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(builder: (context) => const HomeScreen()),

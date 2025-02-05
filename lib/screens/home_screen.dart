@@ -76,19 +76,29 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   getCurrentLocation() async {
-    await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
-        .then(
-      (value) {
-        setState(() {
-          mylat = value.latitude;
-          mylng = value.longitude;
-        });
-      },
-    ).whenComplete(
-      () {
-        setState(() {
-          hasLoaded = true;
-        });
+    Timer.periodic(
+      const Duration(seconds: 10),
+      (timer) async {
+        await Geolocator.getCurrentPosition(
+                desiredAccuracy: LocationAccuracy.high)
+            .then(
+          (value) async {
+            await FirebaseFirestore.instance
+                .collection('Riders')
+                .doc(driverId)
+                .update({'lat': value.latitude, 'lng': value.longitude});
+            setState(() {
+              mylat = value.latitude;
+              mylng = value.longitude;
+            });
+          },
+        ).whenComplete(
+          () {
+            setState(() {
+              hasLoaded = true;
+            });
+          },
+        );
       },
     );
   }
@@ -98,8 +108,12 @@ class _HomeScreenState extends State<HomeScreen> {
   List<LatLng> polylineCoordinates = [];
   PolylinePoints polylinePoints = PolylinePoints();
 
+  bool isPickedUp = false;
+
+  Timer? _timer;
+
   plotPloylines(double merchantLat, double merchantLng) async {
-    Timer.periodic(
+    _timer = Timer.periodic(
       const Duration(seconds: 10),
       (timer) async {
         await Geolocator.getCurrentPosition(
@@ -116,6 +130,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   .map((point) => LatLng(point.latitude, point.longitude))
                   .toList();
             }
+
+            mapController!.animateCamera(CameraUpdate.newLatLngZoom(
+                LatLng(value.latitude, value.longitude), 18.0));
             setState(() {
               markers.clear();
               _poly = Polyline(
@@ -133,6 +150,52 @@ class _HomeScreenState extends State<HomeScreen> {
                   markerId: const MarkerId("pickup"),
                   position: LatLng(merchantLat, merchantLng),
                   infoWindow: const InfoWindow(title: "Merchant's Location")));
+            });
+          },
+        );
+      },
+    );
+  }
+
+  bool isPickedUpUser = false;
+  plotPloylinesUser(double userLat, double userLng) async {
+    Timer.periodic(
+      const Duration(seconds: 10),
+      (timer) async {
+        await Geolocator.getCurrentPosition(
+                desiredAccuracy: LocationAccuracy.high)
+            .then(
+          (value) async {
+            PolylineResult result =
+                await polylinePoints.getRouteBetweenCoordinates(
+                    kGoogleApiKey,
+                    PointLatLng(value.latitude, value.longitude),
+                    PointLatLng(userLat, userLng));
+            if (result.points.isNotEmpty) {
+              polylineCoordinates = result.points
+                  .map((point) => LatLng(point.latitude, point.longitude))
+                  .toList();
+            }
+
+            mapController!.animateCamera(CameraUpdate.newLatLngZoom(
+                LatLng(value.latitude, value.longitude), 18.0));
+            setState(() {
+              markers.clear();
+              _poly = Polyline(
+                  color: Colors.red,
+                  polylineId: const PolylineId('route'),
+                  points: polylineCoordinates,
+                  width: 4);
+
+              mylat = value.latitude;
+              mylng = value.longitude;
+
+              markers.add(Marker(
+                  draggable: true,
+                  icon: BitmapDescriptor.defaultMarker,
+                  markerId: const MarkerId("pickup"),
+                  position: LatLng(userLat, userLng),
+                  infoWindow: const InfoWindow(title: "Users's Location")));
             });
           },
         );
@@ -316,20 +379,110 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: Colors.white,
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: ButtonWidget(
-                        color: secondary,
-                        label: hasAccepted
-                            ? 'Preparing Food...'
-                            : 'Search Bookings',
-                        onPressed: () {
-                          if (hasAccepted) {
-                          } else {
-                            showOrderListDialog();
-                          }
-                        },
-                      ),
-                    ),
+                        padding: const EdgeInsets.all(20.0),
+                        child: hasAccepted
+                            ? StreamBuilder<DocumentSnapshot>(
+                                stream: FirebaseFirestore.instance
+                                    .collection('Orders')
+                                    .doc(orderId)
+                                    .snapshots(),
+                                builder: (context,
+                                    AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                  if (!snapshot.hasData) {
+                                    return const Center(
+                                        child: Center(
+                                            child:
+                                                CircularProgressIndicator()));
+                                  } else if (snapshot.hasError) {
+                                    return const Center(
+                                        child: Text('Something went wrong'));
+                                  } else if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const Center(
+                                        child: Center(
+                                            child:
+                                                CircularProgressIndicator()));
+                                  }
+
+                                  final userData = snapshot.data!.data()
+                                      as Map<String, dynamic>?;
+
+                                  if (userData == null) {
+                                    return const Center(
+                                        child: Text('No data found.'));
+                                  }
+                                  return ButtonWidget(
+                                    color: userData['status'] == 'On the way'
+                                        ? Colors.green
+                                        : secondary,
+                                    label: userData['status'] == 'On the way'
+                                        ? 'Mark as Completed'
+                                        : userData['status'] == 'To Pickup'
+                                            ? 'Order Picked Up'
+                                            : 'Preparing Food...',
+                                    onPressed: () async {
+                                      if (userData['status'] == 'To Pickup') {
+                                        await FirebaseFirestore.instance
+                                            .collection('Orders')
+                                            .doc(orderId)
+                                            .update({'status': 'On the way'});
+
+                                        final user = await FirebaseFirestore
+                                            .instance
+                                            .collection('Users')
+                                            .doc(userData['userId'])
+                                            .get();
+                                        plotPloylinesUser(
+                                            userData['isHome']
+                                                ? user['homeLat']
+                                                : user['officeLat'],
+                                            userData['isHome']
+                                                ? user['homeLng']
+                                                : user['officeLng']);
+                                        setState(() {
+                                          _timer!.cancel();
+                                        });
+                                      } else if (userData['status'] ==
+                                          'On the way') {
+                                        await FirebaseFirestore.instance
+                                            .collection('Orders')
+                                            .doc(orderId)
+                                            .update({
+                                          'status': 'Completed'
+                                        }).whenComplete(
+                                          () async {
+                                            await FirebaseFirestore.instance
+                                                .collection('Riders')
+                                                .doc(driverId)
+                                                .update({
+                                              'isActive': true
+                                            }).whenComplete(
+                                              () {
+                                                Navigator.of(context)
+                                                    .pushAndRemoveUntil(
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const HomeScreen(),
+                                                  ),
+                                                  (route) {
+                                                    return true;
+                                                  },
+                                                );
+                                              },
+                                            );
+                                          },
+                                        );
+                                      }
+                                    },
+                                  );
+                                })
+                            : ButtonWidget(
+                                color: secondary,
+                                label: 'Search Bookings',
+                                onPressed: () {
+                                  showOrderListDialog();
+                                },
+                              )),
                   ),
                 ),
               ],
@@ -342,6 +495,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  String orderId = '';
   String driverId = 'I7FTuyOuTNeo0xkCNjxfT0NBWxF3';
   showOrderListDialog() {
     showDialog(
@@ -766,6 +920,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                         plotPloylines(merchant['lat'], merchant['lng']);
                         setState(() {
+                          orderId = randomOrder.id;
                           hasAccepted = true;
                         });
 
