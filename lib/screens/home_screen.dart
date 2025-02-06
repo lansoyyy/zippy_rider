@@ -35,13 +35,39 @@ class _HomeScreenState extends State<HomeScreen> {
   int orderCount = 0;
   double totalEarned = 0.0;
 
+  late Polyline _poly = const Polyline(polylineId: PolylineId('new'));
+  List<LatLng> polylineCoordinates = [];
+  PolylinePoints polylinePoints = PolylinePoints();
+
+  bool isPickedUp = false;
+  bool isPickedUpUser = false;
+  bool hasLoaded = false;
+  bool hasAccepted = false;
+
+  double mylat = 0;
+  double mylng = 0;
+
+  Set<Marker> markers = {};
+  Timer? _timer;
+
+  String orderId = '';
+  String driverId = 'I7FTuyOuTNeo0xkCNjxfT0NBWxF3';
+
+  GoogleMapController? mapController;
+
   @override
   void initState() {
     super.initState();
     determinePosition();
     fetchUserData();
-
     getCurrentLocation();
+  }
+
+  @override
+  void dispose() {
+    mapController?.dispose();
+    _timer?.cancel();
+    super.dispose();
   }
 
   Future<void> fetchUserData() async {
@@ -57,153 +83,119 @@ class _HomeScreenState extends State<HomeScreen> {
             userData = data;
             profileImage = data['profileImage'];
           });
-        } else {}
+        }
       });
     } catch (e) {
       print("Error fetching user data: $e");
     }
   }
 
-  @override
-  void dispose() {
-    mapController!.dispose();
-    super.dispose();
+  void getCurrentLocation() {
+    _timer = Timer.periodic(const Duration(seconds: 10), (timer) async {
+      await Geolocator.getCurrentPosition(
+              desiredAccuracy: LocationAccuracy.high)
+          .then((value) async {
+        await FirebaseFirestore.instance
+            .collection('Riders')
+            .doc(driverId)
+            .update({
+          'lat': value.latitude,
+          'lng': value.longitude,
+        });
+        setState(() {
+          mylat = value.latitude;
+          mylng = value.longitude;
+          hasLoaded = true;
+        });
+      });
+    });
   }
 
-  getCurrentLocation() async {
-    Timer.periodic(
-      const Duration(seconds: 10),
-      (timer) async {
-        await Geolocator.getCurrentPosition(
-                desiredAccuracy: LocationAccuracy.high)
-            .then(
-          (value) async {
-            await FirebaseFirestore.instance
-                .collection('Riders')
-                .doc(driverId)
-                .update({'lat': value.latitude, 'lng': value.longitude});
-            setState(() {
-              mylat = value.latitude;
-              mylng = value.longitude;
-            });
-          },
-        ).whenComplete(
-          () {
-            setState(() {
-              hasLoaded = true;
-            });
-          },
+  void plotPolylines(double merchantLat, double merchantLng) async {
+    _timer = Timer.periodic(const Duration(seconds: 10), (timer) async {
+      await Geolocator.getCurrentPosition(
+              desiredAccuracy: LocationAccuracy.high)
+          .then((value) async {
+        PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+          kGoogleApiKey,
+          PointLatLng(value.latitude, value.longitude),
+          PointLatLng(merchantLat, merchantLng),
         );
-      },
-    );
+
+        if (result.points.isNotEmpty) {
+          polylineCoordinates = result.points
+              .map((point) => LatLng(point.latitude, point.longitude))
+              .toList();
+        }
+
+        mapController?.animateCamera(CameraUpdate.newLatLngZoom(
+            LatLng(value.latitude, value.longitude), 18.0));
+        setState(() {
+          markers.clear();
+          _poly = Polyline(
+            color: Colors.red,
+            polylineId: const PolylineId('route'),
+            points: polylineCoordinates,
+            width: 4,
+          );
+
+          mylat = value.latitude;
+          mylng = value.longitude;
+
+          markers.add(Marker(
+            draggable: true,
+            icon: BitmapDescriptor.defaultMarker,
+            markerId: const MarkerId("pickup"),
+            position: LatLng(merchantLat, merchantLng),
+            infoWindow: const InfoWindow(title: "Merchant's Location"),
+          ));
+        });
+      });
+    });
   }
 
-  late Polyline _poly = const Polyline(polylineId: PolylineId('new'));
-
-  List<LatLng> polylineCoordinates = [];
-  PolylinePoints polylinePoints = PolylinePoints();
-
-  bool isPickedUp = false;
-
-  Timer? _timer;
-
-  plotPloylines(double merchantLat, double merchantLng) async {
-    _timer = Timer.periodic(
-      const Duration(seconds: 10),
-      (timer) async {
-        await Geolocator.getCurrentPosition(
-                desiredAccuracy: LocationAccuracy.high)
-            .then(
-          (value) async {
-            PolylineResult result =
-                await polylinePoints.getRouteBetweenCoordinates(
-                    kGoogleApiKey,
-                    PointLatLng(value.latitude, value.longitude),
-                    PointLatLng(merchantLat, merchantLng));
-            if (result.points.isNotEmpty) {
-              polylineCoordinates = result.points
-                  .map((point) => LatLng(point.latitude, point.longitude))
-                  .toList();
-            }
-
-            mapController!.animateCamera(CameraUpdate.newLatLngZoom(
-                LatLng(value.latitude, value.longitude), 18.0));
-            setState(() {
-              markers.clear();
-              _poly = Polyline(
-                  color: Colors.red,
-                  polylineId: const PolylineId('route'),
-                  points: polylineCoordinates,
-                  width: 4);
-
-              mylat = value.latitude;
-              mylng = value.longitude;
-
-              markers.add(Marker(
-                  draggable: true,
-                  icon: BitmapDescriptor.defaultMarker,
-                  markerId: const MarkerId("pickup"),
-                  position: LatLng(merchantLat, merchantLng),
-                  infoWindow: const InfoWindow(title: "Merchant's Location")));
-            });
-          },
+  void plotPolylinesUser(double userLat, double userLng) async {
+    _timer = Timer.periodic(const Duration(seconds: 10), (timer) async {
+      await Geolocator.getCurrentPosition(
+              desiredAccuracy: LocationAccuracy.high)
+          .then((value) async {
+        PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+          kGoogleApiKey,
+          PointLatLng(value.latitude, value.longitude),
+          PointLatLng(userLat, userLng),
         );
-      },
-    );
+
+        if (result.points.isNotEmpty) {
+          polylineCoordinates = result.points
+              .map((point) => LatLng(point.latitude, point.longitude))
+              .toList();
+        }
+
+        mapController?.animateCamera(CameraUpdate.newLatLngZoom(
+            LatLng(value.latitude, value.longitude), 18.0));
+        setState(() {
+          markers.clear();
+          _poly = Polyline(
+            color: Colors.red,
+            polylineId: const PolylineId('route'),
+            points: polylineCoordinates,
+            width: 4,
+          );
+
+          mylat = value.latitude;
+          mylng = value.longitude;
+
+          markers.add(Marker(
+            draggable: true,
+            icon: BitmapDescriptor.defaultMarker,
+            markerId: const MarkerId("pickup"),
+            position: LatLng(userLat, userLng),
+            infoWindow: const InfoWindow(title: "User's Location"),
+          ));
+        });
+      });
+    });
   }
-
-  bool isPickedUpUser = false;
-  plotPloylinesUser(double userLat, double userLng) async {
-    Timer.periodic(
-      const Duration(seconds: 10),
-      (timer) async {
-        await Geolocator.getCurrentPosition(
-                desiredAccuracy: LocationAccuracy.high)
-            .then(
-          (value) async {
-            PolylineResult result =
-                await polylinePoints.getRouteBetweenCoordinates(
-                    kGoogleApiKey,
-                    PointLatLng(value.latitude, value.longitude),
-                    PointLatLng(userLat, userLng));
-            if (result.points.isNotEmpty) {
-              polylineCoordinates = result.points
-                  .map((point) => LatLng(point.latitude, point.longitude))
-                  .toList();
-            }
-
-            mapController!.animateCamera(CameraUpdate.newLatLngZoom(
-                LatLng(value.latitude, value.longitude), 18.0));
-            setState(() {
-              markers.clear();
-              _poly = Polyline(
-                  color: Colors.red,
-                  polylineId: const PolylineId('route'),
-                  points: polylineCoordinates,
-                  width: 4);
-
-              mylat = value.latitude;
-              mylng = value.longitude;
-
-              markers.add(Marker(
-                  draggable: true,
-                  icon: BitmapDescriptor.defaultMarker,
-                  markerId: const MarkerId("pickup"),
-                  position: LatLng(userLat, userLng),
-                  infoWindow: const InfoWindow(title: "Users's Location")));
-            });
-          },
-        );
-      },
-    );
-  }
-
-  double mylat = 0;
-  double mylng = 0;
-
-  bool hasLoaded = false;
-
-  Set<Marker> markers = {};
 
   @override
   Widget build(BuildContext context) {
@@ -430,7 +422,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             .collection('Users')
                                             .doc(userData['userId'])
                                             .get();
-                                        plotPloylinesUser(
+                                        plotPolylinesUser(
                                             userData['isHome']
                                                 ? user['homeLat']
                                                 : user['officeLat'],
@@ -493,8 +485,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  String orderId = '';
-  String driverId = 'I7FTuyOuTNeo0xkCNjxfT0NBWxF3';
   showOrderListDialog() {
     showDialog(
       context: context,
@@ -916,7 +906,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         mapController!.animateCamera(CameraUpdate.newLatLngZoom(
                             LatLng(merchant['lat'], merchant['lng']), 18.0));
 
-                        plotPloylines(merchant['lat'], merchant['lng']);
+                        plotPolylines(merchant['lat'], merchant['lng']);
                         setState(() {
                           orderId = randomOrder.id;
                           hasAccepted = true;
@@ -939,10 +929,6 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         });
   }
-
-  GoogleMapController? mapController;
-
-  bool hasAccepted = false;
 
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
