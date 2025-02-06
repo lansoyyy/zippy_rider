@@ -244,7 +244,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 final orders = snapshot.data!.docs;
 
                 if (orders.isEmpty) {
-                  return const Center(child: Text('No orders found.'));
+                  return Center(
+                      child: TextWidget(
+                    text: 'No orders found.',
+                    color: secondary,
+                    fontSize: 18,
+                  ));
                 }
 
                 return Expanded(
