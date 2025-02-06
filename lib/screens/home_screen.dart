@@ -21,11 +21,6 @@ class HomeScreen extends StatefulWidget {
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
-
-  static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(8.4542, 124.6319),
-    zoom: 14.4746,
-  );
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -224,7 +219,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     myLocationButtonEnabled: true,
                     myLocationEnabled: true,
                     markers: markers,
-                    initialCameraPosition: HomeScreen._kGooglePlex,
+                    initialCameraPosition: CameraPosition(
+                      target: LatLng(mylat, mylng),
+                      zoom: 14.4746,
+                    ),
                     onMapCreated: (GoogleMapController controller) {
                       mapController = controller;
                       _controller.complete(controller);
