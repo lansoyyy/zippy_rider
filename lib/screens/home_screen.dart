@@ -133,7 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() {
           markers.clear();
           _poly = Polyline(
-            color: Colors.red,
+            color: primary,
             polylineId: const PolylineId('route'),
             points: polylineCoordinates,
             width: 4,
@@ -438,7 +438,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                             .collection('Orders')
                                             .doc(orderId)
                                             .update({
-                                          'status': 'Completed'
+                                          'status': 'Completed',
+                                          'completedAt':
+                                              FieldValue.serverTimestamp()
                                         }).whenComplete(
                                           () async {
                                             await FirebaseFirestore.instance
@@ -487,6 +489,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   showOrderListDialog() {
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (context) {
         return AlertDialog(
@@ -616,15 +619,21 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: TextWidget(
-                text: 'Close',
-                fontSize: 18,
-                fontFamily: 'Bold',
-                color: secondary,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 10),
+              decoration: BoxDecoration(
+                  border: Border.all(color: secondary, width: 1),
+                  borderRadius: BorderRadius.circular(10)),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+                child: TextWidget(
+                  text: 'Close',
+                  fontSize: 18,
+                  color: black,
+                  fontFamily: "Medium",
+                ),
               ),
             ),
           ],
@@ -635,7 +644,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   showOrderDialog(dynamic randomOrder) {
     showDialog(
-        barrierDismissible: true,
+        barrierDismissible: false,
         context: context,
         builder: (context) {
           return AlertDialog(
@@ -699,6 +708,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           fontFamily: "Bold",
                           color: black),
                       TextWidget(
+                          align: TextAlign.start,
                           text: '${randomOrder?['deliveryAdd'] ?? 'N/A'}',
                           fontSize: 20,
                           fontFamily: "Bold",

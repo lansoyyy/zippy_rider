@@ -168,7 +168,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               stream: FirebaseFirestore.instance
                   .collection('Orders')
                   .where('driverId', isEqualTo: driverId)
-                  .where('status', isEqualTo: 'Delivered')
+                  .where('status', isEqualTo: 'Completed')
                   .snapshots(),
               builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (!snapshot.hasData) {
@@ -227,7 +227,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 children: [
                   TextWidget(
                     text: '${data['merchantName']}',
-                    fontSize: 28,
+                    fontSize: 20,
                     fontFamily: 'Bold',
                     color: secondary,
                   ),
@@ -256,7 +256,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 children: [
                   TextWidget(
                     text:
-                        'Completed on ${DateFormat('MMMM d, y \'at\' h:mm a').format(date)}',
+                        'Completed on ${DateFormat('MMM d, yyyy h:mm a').format(data['completedAt'].toDate())}',
                     fontSize: 15,
                     color: secondary,
                     fontFamily: 'Medium',
