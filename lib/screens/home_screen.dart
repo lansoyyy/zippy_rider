@@ -551,13 +551,8 @@ class _HomeScreenState extends State<HomeScreen> {
               StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
                       .collection('Orders')
-<<<<<<< HEAD
-                      .where('driverId', isEqualTo: driverId)
-                      .where('status', isEqualTo: 'For Pick-up')
-=======
                       .where('driverId', isEqualTo: myId)
                       .where('status', isEqualTo: 'Preparing')
->>>>>>> 9ee11dcfc52136939c4dc373fc86b7ac64abcc7f
                       .snapshots(),
                   builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                     if (!snapshot.hasData) {
