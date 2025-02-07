@@ -15,6 +15,7 @@ import 'package:zippy/utils/const.dart';
 import 'package:zippy/utils/my_location.dart';
 import 'package:zippy/widgets/button_widget.dart';
 import 'package:zippy/widgets/text_widget.dart';
+import 'package:zippy/widgets/toast_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -219,7 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 Container(
                   width: double.infinity,
-                  height: MediaQuery.of(context).size.height * 0.25,
+                  height: MediaQuery.of(context).size.height * 0.3,
                   decoration: const BoxDecoration(
                     color: secondary,
                     borderRadius: BorderRadius.only(
@@ -231,121 +232,176 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding:
-                            const EdgeInsets.only(top: 25, left: 15, right: 15),
-                        child: SafeArea(
-                            child: StreamBuilder<DocumentSnapshot>(
-                                stream: FirebaseFirestore.instance
-                                    .collection('Riders')
-                                    .doc(_auth.currentUser?.uid)
-                                    .snapshots(),
-                                builder: (context,
-                                    AsyncSnapshot<DocumentSnapshot> snapshot) {
-                                  if (!snapshot.hasData) {
-                                    return const Center(
-                                        child: Center(
-                                            child:
-                                                CircularProgressIndicator()));
-                                  } else if (snapshot.hasError) {
-                                    return const Center(
-                                        child: Text('Something went wrong'));
-                                  } else if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return const Center(
-                                        child: Center(
-                                            child:
-                                                CircularProgressIndicator()));
-                                  }
-
-                                  final data = snapshot.data!.data()
-                                      as Map<String, dynamic>?;
-
-                                  if (data == null) {
-                                    return const Center(
-                                        child: Text('No data found.'));
-                                  }
-                                  return Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      SizedBox(
-                                        width: 300,
-                                        child: TextWidget(
-                                          align: TextAlign.start,
-                                          text:
-                                              'Good day! Rider ${data['name']}',
-                                          fontSize: 20,
-                                          fontFamily: 'Bold',
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const ProfilePage()),
-                                          );
-                                        },
-                                        child: CircleAvatar(
-                                          maxRadius: 25,
-                                          minRadius: 25,
-                                          backgroundImage: data[
-                                                      'profileImage'] !=
-                                                  null
-                                              ? NetworkImage(profileImage ??
-                                                  'https://cdn-icons-png.flaticon.com/256/149/149071.png')
-                                              : const NetworkImage(
-                                                  'https://cdn-icons-png.flaticon.com/256/149/149071.png'),
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                })),
-                      ),
-                      Padding(
-                        padding:
-                            const EdgeInsets.only(left: 15, right: 15, top: 15),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                GestureDetector(
-                                    onTap: () {},
-                                    child: _buildCravingOption(
-                                        Icons.home, 'Home', true)),
-                                GestureDetector(
-                                  onTap: () {
-                                    Navigator.of(context).pushReplacement(
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const SalesTab()),
-                                    );
+                  child: SafeArea(
+                    child: Column(
+                      children: [
+                        StreamBuilder<DocumentSnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('Riders')
+                                .doc(myId)
+                                .snapshots(),
+                            builder: (context,
+                                AsyncSnapshot<DocumentSnapshot> snapshot) {
+                              if (!snapshot.hasData) {
+                                return const SizedBox();
+                              } else if (snapshot.hasError) {
+                                return const Center(
+                                    child: Text('Something went wrong'));
+                              } else if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const SizedBox();
+                              }
+                              dynamic data = snapshot.data;
+                              return Align(
+                                alignment: Alignment.topRight,
+                                child: SwitchListTile(
+                                  activeColor: Colors.white,
+                                  value: data['isActive'],
+                                  onChanged: (value) {
+                                    setState(() {
+                                      if (value == true) {
+                                        FirebaseFirestore.instance
+                                            .collection('Riders')
+                                            .doc(myId)
+                                            .update({
+                                          'isActive': true,
+                                        });
+                                        showToast(
+                                            'Passengers can now book a delivery');
+                                      } else {
+                                        FirebaseFirestore.instance
+                                            .collection('Riders')
+                                            .doc(FirebaseAuth
+                                                .instance.currentUser!.uid)
+                                            .update({
+                                          'isActive': false,
+                                        });
+                                        showToast(
+                                            'Passengers will not be able to book a delivery');
+                                      }
+                                    });
                                   },
-                                  child: _buildCravingOption(
-                                      Icons.add_chart_rounded, 'Sales', false),
                                 ),
-                                GestureDetector(
+                              );
+                            }),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              top: 10, left: 15, right: 15),
+                          child: SafeArea(
+                              child: StreamBuilder<DocumentSnapshot>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection('Riders')
+                                      .doc(_auth.currentUser?.uid)
+                                      .snapshots(),
+                                  builder: (context,
+                                      AsyncSnapshot<DocumentSnapshot>
+                                          snapshot) {
+                                    if (!snapshot.hasData) {
+                                      return const Center(
+                                          child: Center(
+                                              child:
+                                                  CircularProgressIndicator()));
+                                    } else if (snapshot.hasError) {
+                                      return const Center(
+                                          child: Text('Something went wrong'));
+                                    } else if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const Center(
+                                          child: Center(
+                                              child:
+                                                  CircularProgressIndicator()));
+                                    }
+
+                                    final data = snapshot.data!.data()
+                                        as Map<String, dynamic>?;
+
+                                    if (data == null) {
+                                      return const Center(
+                                          child: Text('No data found.'));
+                                    }
+                                    return Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        SizedBox(
+                                          width: 300,
+                                          child: TextWidget(
+                                            align: TextAlign.start,
+                                            text:
+                                                'Good day! Rider ${data['name']}',
+                                            fontSize: 20,
+                                            fontFamily: 'Bold',
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const ProfilePage()),
+                                            );
+                                          },
+                                          child: CircleAvatar(
+                                            maxRadius: 25,
+                                            minRadius: 25,
+                                            backgroundImage: data[
+                                                        'profileImage'] !=
+                                                    null
+                                                ? NetworkImage(profileImage ??
+                                                    'https://cdn-icons-png.flaticon.com/256/149/149071.png')
+                                                : const NetworkImage(
+                                                    'https://cdn-icons-png.flaticon.com/256/149/149071.png'),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  })),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 15, right: 15, top: 15),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  GestureDetector(
+                                      onTap: () {},
+                                      child: _buildCravingOption(
+                                          Icons.home, 'Home', true)),
+                                  GestureDetector(
                                     onTap: () {
                                       Navigator.of(context).pushReplacement(
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                const HistoryScreen()),
+                                                const SalesTab()),
                                       );
                                     },
                                     child: _buildCravingOption(
-                                        Icons.history, 'History', false)),
-                              ],
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
+                                        Icons.add_chart_rounded,
+                                        'Sales',
+                                        false),
+                                  ),
+                                  GestureDetector(
+                                      onTap: () {
+                                        Navigator.of(context).pushReplacement(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const HistoryScreen()),
+                                        );
+                                      },
+                                      child: _buildCravingOption(
+                                          Icons.history, 'History', false)),
+                                ],
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 ),
                 Align(
