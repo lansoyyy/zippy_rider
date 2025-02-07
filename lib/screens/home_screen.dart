@@ -407,11 +407,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                         : secondary,
                                     label: userData['status'] == 'On the way'
                                         ? 'Mark as Completed'
-                                        : userData['status'] == 'To Pickup'
+                                        : userData['status'] == 'For Pick-up'
                                             ? 'Order Picked Up'
                                             : 'Preparing Food...',
                                     onPressed: () async {
-                                      if (userData['status'] == 'To Pickup') {
+                                      if (userData['status'] == 'For Pick-up') {
                                         await FirebaseFirestore.instance
                                             .collection('Orders')
                                             .doc(orderId)
@@ -438,7 +438,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             .collection('Orders')
                                             .doc(orderId)
                                             .update({
-                                          'status': 'Completed',
+                                          'status': 'Delivered',
                                           'completedAt':
                                               FieldValue.serverTimestamp()
                                         }).whenComplete(
@@ -500,7 +500,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   stream: FirebaseFirestore.instance
                       .collection('Orders')
                       .where('driverId', isEqualTo: driverId)
-                      .where('status', isEqualTo: 'Preparing')
+                      .where('status', isEqualTo: 'For Pick-up')
                       .snapshots(),
                   builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                     if (!snapshot.hasData) {

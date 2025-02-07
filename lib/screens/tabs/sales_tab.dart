@@ -66,7 +66,7 @@ class _SalesTabState extends State<SalesTab> {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('Orders')
           .where('driverId', isEqualTo: driverId)
-          .where('status', isEqualTo: 'Completed')
+          .where('status', isEqualTo: 'Delivered')
           .get();
 
       double calculatedTotalPrice = 0.0;

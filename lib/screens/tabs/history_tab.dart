@@ -168,7 +168,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               stream: FirebaseFirestore.instance
                   .collection('Orders')
                   .where('driverId', isEqualTo: driverId)
-                  .where('status', isEqualTo: 'Completed')
+                  .where('status', isEqualTo: 'Delivered')
                   .snapshots(),
               builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (!snapshot.hasData) {
