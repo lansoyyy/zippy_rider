@@ -9,6 +9,7 @@ import 'package:zippy/screens/home_screen.dart';
 import 'package:zippy/screens/pages/profile_page.dart';
 import 'package:zippy/screens/tabs/history_tab.dart';
 import 'package:zippy/utils/colors.dart';
+import 'package:zippy/utils/const.dart';
 import 'package:zippy/widgets/text_widget.dart';
 
 class SalesTab extends StatefulWidget {
@@ -23,7 +24,7 @@ class _SalesTabState extends State<SalesTab> {
   String? profileImage;
   int orderCount = 0;
   double totalEarned = 0.0;
-  String driverId = 'I7FTuyOuTNeo0xkCNjxfT0NBWxF3';
+
   Map<String, dynamic>? userData;
 
   @override
@@ -65,7 +66,7 @@ class _SalesTabState extends State<SalesTab> {
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('Orders')
-          .where('driverId', isEqualTo: driverId)
+          .where('driverId', isEqualTo: myId)
           .where('status', isEqualTo: 'Completed')
           .get();
 
@@ -222,7 +223,7 @@ class _SalesTabState extends State<SalesTab> {
             StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('Orders')
-                  .where('driverId', isEqualTo: driverId)
+                  .where('driverId', isEqualTo: myId)
                   .where('status', isEqualTo: 'Delivered')
                   .snapshots(),
               builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {

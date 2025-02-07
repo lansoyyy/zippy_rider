@@ -51,7 +51,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Timer? _timer;
 
   String orderId = '';
-  String driverId = 'I7FTuyOuTNeo0xkCNjxfT0NBWxF3';
 
   GoogleMapController? mapController;
 
@@ -95,10 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
       await Geolocator.getCurrentPosition(
               desiredAccuracy: LocationAccuracy.high)
           .then((value) async {
-        await FirebaseFirestore.instance
-            .collection('Riders')
-            .doc(driverId)
-            .update({
+        await FirebaseFirestore.instance.collection('Riders').doc(myId).update({
           'lat': value.latitude,
           'lng': value.longitude,
         });
@@ -445,7 +441,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           () async {
                                             await FirebaseFirestore.instance
                                                 .collection('Riders')
-                                                .doc(driverId)
+                                                .doc(myId)
                                                 .update({
                                               'isActive': true
                                             }).whenComplete(
@@ -499,7 +495,7 @@ class _HomeScreenState extends State<HomeScreen> {
               StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
                       .collection('Orders')
-                      .where('driverId', isEqualTo: driverId)
+                      .where('driverId', isEqualTo: myId)
                       .where('status', isEqualTo: 'Preparing')
                       .snapshots(),
                   builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -910,7 +906,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             .get();
                         await FirebaseFirestore.instance
                             .collection('Riders')
-                            .doc(driverId)
+                            .doc(myId)
                             .update({'isActive': false});
 
                         mapController!.animateCamera(CameraUpdate.newLatLngZoom(

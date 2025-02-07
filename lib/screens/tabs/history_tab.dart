@@ -6,6 +6,7 @@ import 'package:zippy/screens/home_screen.dart';
 import 'package:zippy/screens/pages/profile_page.dart';
 import 'package:zippy/screens/tabs/sales_tab.dart';
 import 'package:zippy/utils/colors.dart';
+import 'package:zippy/utils/const.dart';
 import 'package:zippy/widgets/text_widget.dart';
 
 class HistoryScreen extends StatefulWidget {
@@ -18,7 +19,7 @@ class HistoryScreen extends StatefulWidget {
 class _HistoryScreenState extends State<HistoryScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String? profileImage;
-  String driverId = 'I7FTuyOuTNeo0xkCNjxfT0NBWxF3';
+
   Map<String, dynamic>? userData;
 
   @override
@@ -33,7 +34,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       if (user != null) {
         FirebaseFirestore.instance
             .collection('Riders')
-            .doc(driverId)
+            .doc(myId)
             .snapshots()
             .listen((event) {
           if (event.exists) {
@@ -167,7 +168,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('Orders')
-                  .where('driverId', isEqualTo: driverId)
+                  .where('driverId', isEqualTo: myId)
                   .where('status', isEqualTo: 'Completed')
                   .snapshots(),
               builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
