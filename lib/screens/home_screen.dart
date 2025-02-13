@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:slide_to_act/slide_to_act.dart';
 import 'package:zippy/screens/pages/profile_page.dart';
 import 'package:zippy/screens/tabs/history_tab.dart';
 import 'package:zippy/screens/tabs/sales_tab.dart';
@@ -541,7 +542,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   showOrderListDialog() {
     showDialog(
-      barrierDismissible: false,
+      barrierDismissible: true,
       context: context,
       builder: (context) {
         return AlertDialog(
@@ -696,7 +697,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   showOrderDialog(dynamic randomOrder) {
     showDialog(
-        barrierDismissible: false,
+        barrierDismissible: true,
         context: context,
         builder: (context) {
           return AlertDialog(
@@ -927,35 +928,19 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             actions: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 35, vertical: 10),
-                    decoration: BoxDecoration(
-                        border: Border.all(color: secondary, width: 1),
-                        borderRadius: BorderRadius.circular(10)),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: TextWidget(
-                        text: 'Cancel',
-                        fontSize: 18,
-                        color: black,
-                        fontFamily: "Medium",
-                      ),
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 35, vertical: 10),
-                    decoration: BoxDecoration(
-                        color: secondary,
-                        borderRadius: BorderRadius.circular(10)),
-                    child: GestureDetector(
-                      onTap: () async {
+              Center(
+                child: Column(
+                  children: [
+                    SlideAction(
+                      outerColor: secondary,
+                      innerColor: white,
+                      // sliderButtonIconPadding: 10,
+                      text: "Slide to Accept Booking",
+                      textStyle: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontFamily: "Medium"),
+                      onSubmit: () async {
                         final merchant = await FirebaseFirestore.instance
                             .collection('Merchant')
                             .doc(randomOrder['merchantId'])
@@ -977,16 +962,89 @@ class _HomeScreenState extends State<HomeScreen> {
                         Navigator.of(context).pop();
                         Navigator.of(context).pop();
                       },
-                      child: TextWidget(
-                        text: 'Accept',
-                        fontSize: 18,
-                        color: white,
-                        fontFamily: "Medium",
+                    ),
+                    const SizedBox(height: 15),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 35, vertical: 10),
+                      decoration: BoxDecoration(
+                          border: Border.all(color: secondary, width: 1),
+                          borderRadius: BorderRadius.circular(10)),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: TextWidget(
+                          text: 'Cancel',
+                          fontSize: 18,
+                          color: black,
+                          fontFamily: "Medium",
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     Container(
+              //       padding: const EdgeInsets.symmetric(
+              //           horizontal: 35, vertical: 10),
+              //       decoration: BoxDecoration(
+              //           border: Border.all(color: secondary, width: 1),
+              //           borderRadius: BorderRadius.circular(10)),
+              //       child: GestureDetector(
+              //         onTap: () {
+              //           Navigator.of(context).pop();
+              //         },
+              //         child: TextWidget(
+              //           text: 'Cancel',
+              //           fontSize: 18,
+              //           color: black,
+              //           fontFamily: "Medium",
+              //         ),
+              //       ),
+              //     ),
+              //     Container(
+              //       padding: const EdgeInsets.symmetric(
+              //           horizontal: 35, vertical: 10),
+              //       decoration: BoxDecoration(
+              //           color: secondary,
+              //           borderRadius: BorderRadius.circular(10)),
+              //       child: GestureDetector(
+              //         onTap: () async {
+              //           final merchant = await FirebaseFirestore.instance
+              //               .collection('Merchant')
+              //               .doc(randomOrder['merchantId'])
+              //               .get();
+              //           await FirebaseFirestore.instance
+              //               .collection('Riders')
+              //               .doc(myId)
+              //               .update({'isActive': false});
+
+              //           mapController!.animateCamera(CameraUpdate.newLatLngZoom(
+              //               LatLng(merchant['lat'], merchant['lng']), 18.0));
+
+              //           plotPolylines(merchant['lat'], merchant['lng']);
+              //           setState(() {
+              //             orderId = randomOrder.id;
+              //             hasAccepted = true;
+              //           });
+
+              //           Navigator.of(context).pop();
+              //           Navigator.of(context).pop();
+              //         },
+              //         child: TextWidget(
+              //           text: 'Accept',
+              //           fontSize: 18,
+              //           color: white,
+              //           fontFamily: "Medium",
+              //         ),
+              //       ),
+              //     ),
+              //   ],
+              // ),
             ],
           );
         });
