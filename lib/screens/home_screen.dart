@@ -201,23 +201,21 @@ class _HomeScreenState extends State<HomeScreen> {
       body: hasLoaded
           ? Stack(
               children: [
-                Expanded(
-                  child: GoogleMap(
-                    polylines: {_poly},
-                    zoomControlsEnabled: false,
-                    mapType: MapType.normal,
-                    myLocationButtonEnabled: true,
-                    myLocationEnabled: true,
-                    markers: markers,
-                    initialCameraPosition: CameraPosition(
-                      target: LatLng(mylat, mylng),
-                      zoom: 14.4746,
-                    ),
-                    onMapCreated: (GoogleMapController controller) {
-                      mapController = controller;
-                      _controller.complete(controller);
-                    },
+                GoogleMap(
+                  polylines: {_poly},
+                  zoomControlsEnabled: false,
+                  mapType: MapType.normal,
+                  myLocationButtonEnabled: true,
+                  myLocationEnabled: true,
+                  markers: markers,
+                  initialCameraPosition: CameraPosition(
+                    target: LatLng(mylat, mylng),
+                    zoom: 14.4746,
                   ),
+                  onMapCreated: (GoogleMapController controller) {
+                    mapController = controller;
+                    _controller.complete(controller);
+                  },
                 ),
                 Container(
                   width: double.infinity,
