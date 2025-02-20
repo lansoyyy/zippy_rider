@@ -324,7 +324,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     actions: [
                                       Container(
                                         padding: const EdgeInsets.symmetric(
-                                            horizontal: 35, vertical: 10),
+                                            horizontal: 20, vertical: 10),
                                         decoration: BoxDecoration(
                                             color: secondary,
                                             borderRadius:
@@ -343,7 +343,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ),
                                       Container(
                                         padding: const EdgeInsets.symmetric(
-                                            horizontal: 35, vertical: 10),
+                                            horizontal: 20, vertical: 10),
                                         decoration: BoxDecoration(
                                             color: Colors.transparent,
                                             border:
