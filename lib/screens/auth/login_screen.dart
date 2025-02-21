@@ -28,8 +28,8 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(
-                  height: 50,
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.1,
                 ),
                 Image.asset(
                   logo,
@@ -44,6 +44,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   text: 'Hi! Welcome',
                   fontSize: 25,
                   color: secondary,
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.1,
                 ),
               ],
             ),
