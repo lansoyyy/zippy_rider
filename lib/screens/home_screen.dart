@@ -266,7 +266,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           'isActive': true,
                                         });
                                         showToast(
-                                            'Passengers can now book a delivery');
+                                            'Customers can now book a delivery');
                                       } else {
                                         FirebaseFirestore.instance
                                             .collection('Riders')
@@ -276,7 +276,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           'isActive': false,
                                         });
                                         showToast(
-                                            'Passengers will not be able to book a delivery');
+                                            'Customers will not be able to book a delivery');
                                       }
                                     });
                                   },
