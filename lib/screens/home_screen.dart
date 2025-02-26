@@ -112,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void plotPolylines(double merchantLat, double merchantLng) async {
     _timer = Timer.periodic(const Duration(seconds: 10), (timer) async {
       await Geolocator.getCurrentPosition(
-              desiredAccuracy: LocationAccuracy.high)
+              desiredAccuracy: LocationAccuracy.best)
           .then((value) async {
         PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
           kGoogleApiKey,
@@ -155,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void plotPolylinesUser(double userLat, double userLng) async {
     _timer = Timer.periodic(const Duration(seconds: 10), (timer) async {
       await Geolocator.getCurrentPosition(
-              desiredAccuracy: LocationAccuracy.high)
+              desiredAccuracy: LocationAccuracy.best)
           .then((value) async {
         PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
           kGoogleApiKey,
