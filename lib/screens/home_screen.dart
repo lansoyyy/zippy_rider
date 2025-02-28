@@ -406,7 +406,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Align(
                   alignment: Alignment.bottomLeft,
                   child: Container(
-                    height: 90,
+                    height: 115,
                     width: double.infinity,
                     decoration: const BoxDecoration(
                       borderRadius: BorderRadius.only(
@@ -452,16 +452,24 @@ class _HomeScreenState extends State<HomeScreen> {
                                     return const Center(
                                         child: Text('No data found.'));
                                   }
-                                  return ButtonWidget(
-                                    color: userData['status'] == 'On the way'
-                                        ? Colors.green
-                                        : secondary,
-                                    label: userData['status'] == 'On the way'
+                                  return SlideAction(
+                                    // height: 150,
+                                    outerColor:
+                                        userData['status'] == 'On the way'
+                                            ? Colors.green
+                                            : secondary,
+                                    innerColor: white,
+                                    // sliderButtonIconPadding: 10,
+                                    text: userData['status'] == 'On the way'
                                         ? 'Mark as Completed'
                                         : userData['status'] == 'For Pick-up'
                                             ? 'Order Picked Up'
                                             : 'Preparing Food...',
-                                    onPressed: () async {
+                                    textStyle: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                        fontFamily: "Medium"),
+                                    onSubmit: () async {
                                       if (userData['status'] == 'For Pick-up') {
                                         await FirebaseFirestore.instance
                                             .collection('Orders')
@@ -518,6 +526,72 @@ class _HomeScreenState extends State<HomeScreen> {
                                       }
                                     },
                                   );
+                                  // return ButtonWidget(
+                                  //   color: userData['status'] == 'On the way'
+                                  //       ? Colors.green
+                                  //       : secondary,
+                                  //   label: userData['status'] == 'On the way'
+                                  //       ? 'Mark as Completed'
+                                  //       : userData['status'] == 'For Pick-up'
+                                  //           ? 'Order Picked Up'
+                                  //           : 'Preparing Food...',
+                                  //   onPressed: () async {
+                                  //     if (userData['status'] == 'For Pick-up') {
+                                  //       await FirebaseFirestore.instance
+                                  //           .collection('Orders')
+                                  //           .doc(orderId)
+                                  //           .update({'status': 'On the way'});
+
+                                  //       final user = await FirebaseFirestore
+                                  //           .instance
+                                  //           .collection('Users')
+                                  //           .doc(userData['userId'])
+                                  //           .get();
+                                  //       plotPolylinesUser(
+                                  //           userData['isHome']
+                                  //               ? user['homeLat']
+                                  //               : user['officeLat'],
+                                  //           userData['isHome']
+                                  //               ? user['homeLng']
+                                  //               : user['officeLng']);
+                                  //       setState(() {
+                                  //         _timer!.cancel();
+                                  //       });
+                                  //     } else if (userData['status'] ==
+                                  //         'On the way') {
+                                  //       await FirebaseFirestore.instance
+                                  //           .collection('Orders')
+                                  //           .doc(orderId)
+                                  //           .update({
+                                  //         'status': 'Delivered',
+                                  //         'completedAt':
+                                  //             FieldValue.serverTimestamp()
+                                  //       }).whenComplete(
+                                  //         () async {
+                                  //           await FirebaseFirestore.instance
+                                  //               .collection('Riders')
+                                  //               .doc(myId)
+                                  //               .update({
+                                  //             'isActive': true
+                                  //           }).whenComplete(
+                                  //             () {
+                                  //               Navigator.of(context)
+                                  //                   .pushAndRemoveUntil(
+                                  //                 MaterialPageRoute(
+                                  //                   builder: (context) =>
+                                  //                       const HomeScreen(),
+                                  //                 ),
+                                  //                 (route) {
+                                  //                   return true;
+                                  //                 },
+                                  //               );
+                                  //             },
+                                  //           );
+                                  //         },
+                                  //       );
+                                  //     }
+                                  //   },
+                                  // );
                                 })
                             : ButtonWidget(
                                 color: secondary,
