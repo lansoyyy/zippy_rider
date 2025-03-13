@@ -113,12 +113,13 @@ class _HomeScreenState extends State<HomeScreen> {
   void plotPolylines(double merchantLat, double merchantLng) async {
     _timer = Timer.periodic(const Duration(seconds: 10), (timer) async {
       await Geolocator.getCurrentPosition(
-              desiredAccuracy: LocationAccuracy.best)
+              desiredAccuracy: LocationAccuracy.bestForNavigation)
           .then((value) async {
         PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
           kGoogleApiKey,
           PointLatLng(value.latitude, value.longitude),
           PointLatLng(merchantLat, merchantLng),
+          travelMode: TravelMode.driving,
         );
 
         if (result.points.isNotEmpty) {
@@ -127,9 +128,29 @@ class _HomeScreenState extends State<HomeScreen> {
               .toList();
         }
 
-        mapController?.animateCamera(CameraUpdate.newLatLngZoom(
-            LatLng(value.latitude, value.longitude), 18.0));
-        setState(() {
+        mapController?.animateCamera(CameraUpdate.newLatLngBounds(
+          LatLngBounds(
+            southwest: LatLng(
+              polylineCoordinates
+                  .map((e) => e.latitude)
+                  .reduce((a, b) => a < b ? a : b),
+              polylineCoordinates
+                  .map((e) => e.longitude)
+                  .reduce((a, b) => a < b ? a : b),
+            ),
+            northeast: LatLng(
+              polylineCoordinates
+                  .map((e) => e.latitude)
+                  .reduce((a, b) => a > b ? a : b),
+              polylineCoordinates
+                  .map((e) => e.longitude)
+                  .reduce((a, b) => a > b ? a : b),
+            ),
+          ),
+          100.0,
+        ));
+
+        setState(() async {
           markers.clear();
           _poly = Polyline(
             color: primary,
@@ -140,6 +161,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
           mylat = value.latitude;
           mylng = value.longitude;
+
+          markers.add(Marker(
+            draggable: true,
+            icon: await BitmapDescriptor.fromAssetImage(
+                const ImageConfiguration(size: Size(48, 48)),
+                'assets/images/icon2.png'),
+            markerId: const MarkerId("rider"),
+            position: LatLng(value.latitude, value.longitude),
+            infoWindow: const InfoWindow(title: "Rider's Location"),
+          ));
 
           markers.add(Marker(
             draggable: true,
@@ -1040,14 +1071,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       Column(
                         children: randomOrder?['items'] != null
                             ? (randomOrder!['items'] as String)
-                                .split(',')
+                                .trimLeft()
+                                .split('\n')
                                 .map((item) {
                                 return Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     TextWidget(
-                                      text: item.trim(),
+                                      text: item.trimLeft(),
                                       fontSize: 20,
                                       fontFamily: "Bold",
                                       color: black,
@@ -1258,20 +1290,25 @@ class _HomeScreenState extends State<HomeScreen> {
                       fontFamily: "Medium",
                     ),
                     onSubmit: () async {
-                      if (randomOrder['type'] == 'purchase') {
+                      if (randomOrder['type'] == 'Purchase') {
                         await FirebaseFirestore.instance
                             .collection('Riders')
                             .doc(myId)
                             .update({'isActive': false});
 
+                        final user = await FirebaseFirestore.instance
+                            .collection('Purchase')
+                            .doc(randomOrder.id)
+                            .get();
+
                         mapController!.animateCamera(
                           CameraUpdate.newLatLngZoom(
-                            LatLng(randomOrder['lat'], randomOrder['lng']),
+                            LatLng(user['deliveryLat'], user['deliveryLng']),
                             18.0,
                           ),
                         );
 
-                        plotPolylines(randomOrder['lat'], randomOrder['lng']);
+                        plotPolylines(user['deliveryLat'], user['deliveryLng']);
                         setState(() {
                           orderId = randomOrder.id;
                           hasAccepted = true;
