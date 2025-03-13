@@ -881,83 +881,36 @@ class _HomeScreenState extends State<HomeScreen> {
       barrierDismissible: true,
       context: context,
       builder: (context) {
-        return SizedBox(
-          width: MediaQuery.of(context).size.width,
-          child: AlertDialog(
-            title: Row(
+        return AlertDialog(
+          title: Row(
+            children: [
+              TextWidget(
+                text: randomOrder['type'] == 'Purchase'
+                    ? "Purchase Delivery"
+                    : "Food Delivery",
+                fontSize: 25,
+                fontFamily: "Bold",
+                color: secondary,
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextWidget(
-                  text: randomOrder['type'] == 'Purchase'
-                      ? "Purchase Delivery"
-                      : "Food Delivery",
-                  fontSize: 25,
-                  fontFamily: "Bold",
-                  color: secondary,
-                ),
-              ],
-            ),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (randomOrder['type'] != 'Purchase') ...[
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TextWidget(
-                          text: "Reference Code: ",
-                          fontSize: 18,
-                          fontFamily: "Bold",
-                          color: black,
-                        ),
-                        TextWidget(
-                          text: '${randomOrder.id ?? 'N/A'}',
-                          fontSize: 20,
-                          fontFamily: "Bold",
-                          color: secondary,
-                        ),
-                        const Divider(
-                          color: secondary,
-                        ),
-                      ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TextWidget(
-                          text: "Shop: ",
-                          fontSize: 18,
-                          fontFamily: "Bold",
-                          color: black,
-                        ),
-                        TextWidget(
-                          text: '${randomOrder?['merchantName'] ?? 'N/A'}',
-                          fontSize: 20,
-                          fontFamily: "Bold",
-                          color: secondary,
-                        ),
-                        const Divider(
-                          color: secondary,
-                        ),
-                      ],
-                    ),
-                  ],
+                if (randomOrder['type'] != 'Purchase') ...[
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       TextWidget(
-                        text: "Address: ",
+                        text: "Reference Code: ",
                         fontSize: 18,
                         fontFamily: "Bold",
                         color: black,
                       ),
                       TextWidget(
-                        align: TextAlign.start,
-                        text: randomOrder['type'] == 'Purchase'
-                            ? '${randomOrder?['deliveryAddress'] ?? 'N/A'}'
-                            : '${randomOrder?['deliveryAdd'] ?? 'N/A'}',
+                        text: '${randomOrder.id ?? 'N/A'}',
                         fontSize: 20,
                         fontFamily: "Bold",
                         color: secondary,
@@ -967,372 +920,417 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-                  if (randomOrder['type'] != 'Purchase') ...[
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TextWidget(
-                          text: "Order List: ",
-                          fontSize: 23,
-                          fontFamily: "Bold",
-                          color: secondary,
-                        ),
-                        Column(
-                          children: randomOrder?['items'] != null
-                              ? (randomOrder!['items'] as List<dynamic>)
-                                  .fold<Map<String, int>>({}, (acc, order) {
-                                    acc.update(
-                                        order['name'], (value) => value + 1,
-                                        ifAbsent: () => 1);
-                                    return acc;
-                                  })
-                                  .entries
-                                  .map((entry) {
-                                    final order = randomOrder!['items']
-                                        .firstWhere((item) =>
-                                            item['name'] == entry.key);
-                                    final totalPrice =
-                                        (order['price'] as num) * entry.value;
-                                    return Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        TextWidget(
-                                          text: 'x${entry.value} ${entry.key} ',
-                                          fontSize: 20,
-                                          fontFamily: "Bold",
-                                          color: black,
-                                        ),
-                                        TextWidget(
-                                          text: totalPrice != ''
-                                              ? '₱ ${totalPrice.toStringAsFixed(2)}'
-                                              : 'N/A',
-                                          fontSize: 20,
-                                          fontFamily: "Bold",
-                                          color: secondary,
-                                        ),
-                                      ],
-                                    );
-                                  })
-                                  .toList()
-                              : [
-                                  TextWidget(
-                                    text: 'No order details available',
-                                    fontSize: 18,
-                                    fontFamily: "Medium",
-                                    color: black,
-                                  )
-                                ],
-                        ),
-                        const Divider(
-                          color: secondary,
-                        ),
-                      ],
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextWidget(
+                        text: "Shop: ",
+                        fontSize: 18,
+                        fontFamily: "Bold",
+                        color: black,
+                      ),
+                      TextWidget(
+                        text: '${randomOrder?['merchantName'] ?? 'N/A'}',
+                        fontSize: 20,
+                        fontFamily: "Bold",
+                        color: secondary,
+                      ),
+                      const Divider(
+                        color: secondary,
+                      ),
+                    ],
+                  ),
+                ],
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    TextWidget(
+                      text: "Address: ",
+                      fontSize: 18,
+                      fontFamily: "Bold",
+                      color: black,
                     ),
-                  ] else ...[
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TextWidget(
-                          text: "Items: ",
-                          fontSize: 23,
-                          fontFamily: "Bold",
-                          color: secondary,
-                        ),
-                        Column(
-                          children: randomOrder?['items'] != null
-                              ? (randomOrder!['items'] as String)
-                                  .split(',')
-                                  .map((item) {
+                    TextWidget(
+                      align: TextAlign.start,
+                      text: randomOrder['type'] == 'Purchase'
+                          ? '${randomOrder?['deliveryAddress'] ?? 'N/A'}'
+                          : '${randomOrder?['deliveryAdd'] ?? 'N/A'}',
+                      fontSize: 20,
+                      fontFamily: "Bold",
+                      color: secondary,
+                    ),
+                    const Divider(
+                      color: secondary,
+                    ),
+                  ],
+                ),
+                if (randomOrder['type'] != 'Purchase') ...[
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextWidget(
+                        text: "Order List: ",
+                        fontSize: 23,
+                        fontFamily: "Bold",
+                        color: secondary,
+                      ),
+                      Column(
+                        children: randomOrder?['items'] != null
+                            ? (randomOrder!['items'] as List<dynamic>)
+                                .fold<Map<String, int>>({}, (acc, order) {
+                                  acc.update(
+                                      order['name'], (value) => value + 1,
+                                      ifAbsent: () => 1);
+                                  return acc;
+                                })
+                                .entries
+                                .map((entry) {
+                                  final order = randomOrder!['items']
+                                      .firstWhere(
+                                          (item) => item['name'] == entry.key);
+                                  final totalPrice =
+                                      (order['price'] as num) * entry.value;
                                   return Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       TextWidget(
-                                        text: item.trim(),
+                                        text: 'x${entry.value} ${entry.key} ',
                                         fontSize: 20,
                                         fontFamily: "Bold",
                                         color: black,
                                       ),
+                                      TextWidget(
+                                        text: totalPrice != ''
+                                            ? '₱ ${totalPrice.toStringAsFixed(2)}'
+                                            : 'N/A',
+                                        fontSize: 20,
+                                        fontFamily: "Bold",
+                                        color: secondary,
+                                      ),
                                     ],
                                   );
-                                }).toList()
-                              : [
-                                  TextWidget(
-                                    text: 'No items available',
-                                    fontSize: 18,
-                                    fontFamily: "Medium",
-                                    color: black,
-                                  )
-                                ],
-                        ),
-                        const Divider(
-                          color: secondary,
-                        ),
-                      ],
+                                })
+                                .toList()
+                            : [
+                                TextWidget(
+                                  text: 'No order details available',
+                                  fontSize: 18,
+                                  fontFamily: "Medium",
+                                  color: black,
+                                )
+                              ],
+                      ),
+                      const Divider(
+                        color: secondary,
+                      ),
+                    ],
+                  ),
+                ] else ...[
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextWidget(
+                        text: "Items: ",
+                        fontSize: 23,
+                        fontFamily: "Bold",
+                        color: secondary,
+                      ),
+                      Column(
+                        children: randomOrder?['items'] != null
+                            ? (randomOrder!['items'] as String)
+                                .split(',')
+                                .map((item) {
+                                return Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    TextWidget(
+                                      text: item.trim(),
+                                      fontSize: 20,
+                                      fontFamily: "Bold",
+                                      color: black,
+                                    ),
+                                  ],
+                                );
+                              }).toList()
+                            : [
+                                TextWidget(
+                                  text: 'No items available',
+                                  fontSize: 18,
+                                  fontFamily: "Medium",
+                                  color: black,
+                                )
+                              ],
+                      ),
+                      const Divider(
+                        color: secondary,
+                      ),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextWidget(
+                        text: "Name: ",
+                        fontSize: 18,
+                        fontFamily: "Bold",
+                        color: black,
+                      ),
+                      TextWidget(
+                        text: '${randomOrder?['name'] ?? 'N/A'}',
+                        fontSize: 20,
+                        fontFamily: "Bold",
+                        color: secondary,
+                      ),
+                      const Divider(
+                        color: secondary,
+                      ),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextWidget(
+                        text: "Mobile: ",
+                        fontSize: 18,
+                        fontFamily: "Bold",
+                        color: black,
+                      ),
+                      TextWidget(
+                        text: '${randomOrder?['mobile'] ?? 'N/A'}',
+                        fontSize: 20,
+                        fontFamily: "Bold",
+                        color: secondary,
+                      ),
+                      const Divider(
+                        color: secondary,
+                      ),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextWidget(
+                        text: "Delivery Offer: ",
+                        fontSize: 18,
+                        fontFamily: "Bold",
+                        color: black,
+                      ),
+                      TextWidget(
+                        text: randomOrder != null &&
+                                randomOrder?['deliveryFeeOffer'] != null
+                            ? '₱${(randomOrder?['deliveryFeeOffer'])}'
+                            : 'N/A',
+                        fontSize: 20,
+                        fontFamily: "Bold",
+                        color: secondary,
+                      ),
+                      const Divider(
+                        color: secondary,
+                      ),
+                    ],
+                  ),
+                ],
+                if (randomOrder['type'] != 'Purchase') ...[
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          TextWidget(
+                            text: "Payment: ",
+                            fontSize: 18,
+                            fontFamily: "Bold",
+                            color: black,
+                          ),
+                          TextWidget(
+                            text: '${randomOrder?['mop'] ?? 'N/A'}',
+                            fontSize: 20,
+                            fontFamily: "Bold",
+                            color: secondary,
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          TextWidget(
+                            text: 'Subtotal: ',
+                            fontSize: 20,
+                            fontFamily: "Bold",
+                            color: black,
+                          ),
+                          TextWidget(
+                            text: randomOrder != null &&
+                                    randomOrder?['subtotal'] != null
+                                ? '₱${(randomOrder?['subtotal'] as num).toStringAsFixed(2)}'
+                                : 'N/A',
+                            fontSize: 20,
+                            fontFamily: "Bold",
+                            color: secondary,
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          TextWidget(
+                            text: "Delivery Fee: ",
+                            fontSize: 20,
+                            fontFamily: "Bold",
+                            color: black,
+                          ),
+                          TextWidget(
+                            text: randomOrder != null &&
+                                    randomOrder?['deliveryFee'] != null
+                                ? '₱${(randomOrder?['deliveryFee'] as num).toStringAsFixed(2)}'
+                                : 'N/A',
+                            fontSize: 20,
+                            fontFamily: "Bold",
+                            color: secondary,
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          TextWidget(
+                            text: "Tip: ",
+                            fontSize: 20,
+                            fontFamily: "Bold",
+                            color: black,
+                          ),
+                          TextWidget(
+                            text: randomOrder != null &&
+                                    randomOrder?['tip'] != null
+                                ? '₱${(randomOrder?['tip'] as num).toStringAsFixed(2)}'
+                                : 'N/A',
+                            fontSize: 20,
+                            fontFamily: "Bold",
+                            color: secondary,
+                          ),
+                        ],
+                      ),
+                      const Divider(
+                        color: secondary,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          TextWidget(
+                            text: "Amount to pay: ",
+                            fontSize: 20,
+                            fontFamily: "Bold",
+                            color: black,
+                          ),
+                          TextWidget(
+                            text: randomOrder != null &&
+                                    randomOrder?['total'] != null
+                                ? '₱${(randomOrder?['total'] as num).toStringAsFixed(2)}'
+                                : 'N/A',
+                            fontSize: 20,
+                            fontFamily: "Bold",
+                            color: secondary,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+          actions: [
+            Center(
+              widthFactor: 5,
+              child: Column(
+                children: [
+                  SlideAction(
+                    outerColor: secondary,
+                    innerColor: white,
+                    text: "Slide to Accept Booking",
+                    textStyle: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontFamily: "Medium",
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TextWidget(
-                          text: "Name: ",
-                          fontSize: 18,
-                          fontFamily: "Bold",
-                          color: black,
-                        ),
-                        TextWidget(
-                          text: '${randomOrder?['name'] ?? 'N/A'}',
-                          fontSize: 20,
-                          fontFamily: "Bold",
-                          color: secondary,
-                        ),
-                        const Divider(
-                          color: secondary,
-                        ),
-                      ],
+                    onSubmit: () async {
+                      if (randomOrder['type'] == 'purchase') {
+                        await FirebaseFirestore.instance
+                            .collection('Riders')
+                            .doc(myId)
+                            .update({'isActive': false});
+
+                        mapController!.animateCamera(
+                          CameraUpdate.newLatLngZoom(
+                            LatLng(randomOrder['lat'], randomOrder['lng']),
+                            18.0,
+                          ),
+                        );
+
+                        plotPolylines(randomOrder['lat'], randomOrder['lng']);
+                        setState(() {
+                          orderId = randomOrder.id;
+                          hasAccepted = true;
+                        });
+
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop();
+                      } else {
+                        final merchant = await FirebaseFirestore.instance
+                            .collection('Merchant')
+                            .doc(randomOrder['merchantId'])
+                            .get();
+                        await FirebaseFirestore.instance
+                            .collection('Riders')
+                            .doc(myId)
+                            .update({'isActive': false});
+
+                        mapController!.animateCamera(
+                          CameraUpdate.newLatLngZoom(
+                            LatLng(merchant['lat'], merchant['lng']),
+                            18.0,
+                          ),
+                        );
+
+                        plotPolylines(merchant['lat'], merchant['lng']);
+                        setState(() {
+                          orderId = randomOrder.id;
+                          hasAccepted = true;
+                        });
+
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop();
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 15),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 35, vertical: 10),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: secondary, width: 1),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TextWidget(
-                          text: "Mobile: ",
-                          fontSize: 18,
-                          fontFamily: "Bold",
-                          color: black,
-                        ),
-                        TextWidget(
-                          text: '${randomOrder?['mobile'] ?? 'N/A'}',
-                          fontSize: 20,
-                          fontFamily: "Bold",
-                          color: secondary,
-                        ),
-                        const Divider(
-                          color: secondary,
-                        ),
-                      ],
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: TextWidget(
+                        text: 'Cancel',
+                        fontSize: 18,
+                        color: black,
+                        fontFamily: "Medium",
+                      ),
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TextWidget(
-                          text: "Delivery Offer: ",
-                          fontSize: 18,
-                          fontFamily: "Bold",
-                          color: black,
-                        ),
-                        TextWidget(
-                          text: randomOrder != null &&
-                                  randomOrder?['deliveryFeeOffer'] != null
-                              ? '₱${(randomOrder?['deliveryFeeOffer'])}'
-                              : 'N/A',
-                          fontSize: 20,
-                          fontFamily: "Bold",
-                          color: secondary,
-                        ),
-                        const Divider(
-                          color: secondary,
-                        ),
-                      ],
-                    ),
-                  ],
-                  if (randomOrder['type'] != 'Purchase') ...[
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            TextWidget(
-                              text: "Payment: ",
-                              fontSize: 18,
-                              fontFamily: "Bold",
-                              color: black,
-                            ),
-                            TextWidget(
-                              text: '${randomOrder?['mop'] ?? 'N/A'}',
-                              fontSize: 20,
-                              fontFamily: "Bold",
-                              color: secondary,
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            TextWidget(
-                              text: 'Subtotal: ',
-                              fontSize: 20,
-                              fontFamily: "Bold",
-                              color: black,
-                            ),
-                            TextWidget(
-                              text: randomOrder != null &&
-                                      randomOrder?['subtotal'] != null
-                                  ? '₱${(randomOrder?['subtotal'] as num).toStringAsFixed(2)}'
-                                  : 'N/A',
-                              fontSize: 20,
-                              fontFamily: "Bold",
-                              color: secondary,
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            TextWidget(
-                              text: "Delivery Fee: ",
-                              fontSize: 20,
-                              fontFamily: "Bold",
-                              color: black,
-                            ),
-                            TextWidget(
-                              text: randomOrder != null &&
-                                      randomOrder?['deliveryFee'] != null
-                                  ? '₱${(randomOrder?['deliveryFee'] as num).toStringAsFixed(2)}'
-                                  : 'N/A',
-                              fontSize: 20,
-                              fontFamily: "Bold",
-                              color: secondary,
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            TextWidget(
-                              text: "Tip: ",
-                              fontSize: 20,
-                              fontFamily: "Bold",
-                              color: black,
-                            ),
-                            TextWidget(
-                              text: randomOrder != null &&
-                                      randomOrder?['tip'] != null
-                                  ? '₱${(randomOrder?['tip'] as num).toStringAsFixed(2)}'
-                                  : 'N/A',
-                              fontSize: 20,
-                              fontFamily: "Bold",
-                              color: secondary,
-                            ),
-                          ],
-                        ),
-                        const Divider(
-                          color: secondary,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            TextWidget(
-                              text: "Amount to pay: ",
-                              fontSize: 20,
-                              fontFamily: "Bold",
-                              color: black,
-                            ),
-                            TextWidget(
-                              text: randomOrder != null &&
-                                      randomOrder?['total'] != null
-                                  ? '₱${(randomOrder?['total'] as num).toStringAsFixed(2)}'
-                                  : 'N/A',
-                              fontSize: 20,
-                              fontFamily: "Bold",
-                              color: secondary,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
+                  ),
                 ],
               ),
             ),
-            actions: [
-              Center(
-                child: Column(
-                  children: [
-                    SlideAction(
-                      outerColor: secondary,
-                      innerColor: white,
-                      text: "Slide to Accept Booking",
-                      textStyle: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontFamily: "Medium",
-                      ),
-                      onSubmit: () async {
-                        if (randomOrder['type'] == 'purchase') {
-                          await FirebaseFirestore.instance
-                              .collection('Riders')
-                              .doc(myId)
-                              .update({'isActive': false});
-
-                          mapController!.animateCamera(
-                            CameraUpdate.newLatLngZoom(
-                              LatLng(randomOrder['lat'], randomOrder['lng']),
-                              18.0,
-                            ),
-                          );
-
-                          plotPolylines(randomOrder['lat'], randomOrder['lng']);
-                          setState(() {
-                            orderId = randomOrder.id;
-                            hasAccepted = true;
-                          });
-
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pop();
-                        } else {
-                          final merchant = await FirebaseFirestore.instance
-                              .collection('Merchant')
-                              .doc(randomOrder['merchantId'])
-                              .get();
-                          await FirebaseFirestore.instance
-                              .collection('Riders')
-                              .doc(myId)
-                              .update({'isActive': false});
-
-                          mapController!.animateCamera(
-                            CameraUpdate.newLatLngZoom(
-                              LatLng(merchant['lat'], merchant['lng']),
-                              18.0,
-                            ),
-                          );
-
-                          plotPolylines(merchant['lat'], merchant['lng']);
-                          setState(() {
-                            orderId = randomOrder.id;
-                            hasAccepted = true;
-                          });
-
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pop();
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 15),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 35, vertical: 10),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: secondary, width: 1),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: TextWidget(
-                          text: 'Cancel',
-                          fontSize: 18,
-                          color: black,
-                          fontFamily: "Medium",
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          ],
         );
       },
     );
