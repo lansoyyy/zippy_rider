@@ -34,6 +34,7 @@ class LandingScreen extends StatelessWidget {
               height: 100,
             ),
             ButtonWidget(
+              height: 70,
               textColor: Colors.white,
               color: secondary,
               label: 'Get Started',

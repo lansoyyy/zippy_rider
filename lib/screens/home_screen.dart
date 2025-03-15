@@ -460,170 +460,160 @@ class _HomeScreenState extends State<HomeScreen> {
                                     .doc(orderId)
                                     .snapshots(),
                                 builder: (context,
-                                    AsyncSnapshot<DocumentSnapshot> snapshot) {
-                                  if (!snapshot.hasData) {
-                                    return const Center(
-                                        child: Center(
-                                            child:
-                                                CircularProgressIndicator()));
-                                  } else if (snapshot.hasError) {
-                                    return const Center(
-                                        child: Text('Something went wrong'));
-                                  } else if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return const Center(
-                                        child: Center(
-                                            child:
-                                                CircularProgressIndicator()));
-                                  }
+                                    AsyncSnapshot<DocumentSnapshot>
+                                        orderSnapshot) {
+                                  return StreamBuilder<DocumentSnapshot>(
+                                    stream: FirebaseFirestore.instance
+                                        .collection('Purchase')
+                                        .doc(orderId)
+                                        .snapshots(),
+                                    builder: (context,
+                                        AsyncSnapshot<DocumentSnapshot>
+                                            purchaseSnapshot) {
+                                      if (!orderSnapshot.hasData &&
+                                          !purchaseSnapshot.hasData) {
+                                        return const Center(
+                                            child: CircularProgressIndicator());
+                                      }
 
-                                  final userData = snapshot.data!.data()
-                                      as Map<String, dynamic>?;
+                                      final orderData = orderSnapshot.hasData
+                                          ? orderSnapshot.data?.data()
+                                              as Map<String, dynamic>?
+                                          : null;
 
-                                  if (userData == null) {
-                                    return const Center(
-                                        child: Text('No data found.'));
-                                  }
-                                  return SlideAction(
-                                    // height: 150,
-                                    outerColor:
-                                        userData['status'] == 'On the way'
-                                            ? Colors.green
-                                            : secondary,
-                                    innerColor: white,
-                                    // sliderButtonIconPadding: 10,
-                                    text: userData['status'] == 'On the way'
-                                        ? 'Mark as Completed'
-                                        : userData['status'] == 'For Pick-up'
-                                            ? 'Order Picked Up'
-                                            : 'Preparing Food...',
-                                    textStyle: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 18,
-                                        fontFamily: "Medium"),
-                                    onSubmit: () async {
-                                      if (userData['status'] == 'For Pick-up') {
-                                        await FirebaseFirestore.instance
-                                            .collection('Orders')
-                                            .doc(orderId)
-                                            .update({'status': 'On the way'});
+                                      final purchaseData =
+                                          purchaseSnapshot.hasData
+                                              ? purchaseSnapshot.data?.data()
+                                                  as Map<String, dynamic>?
+                                              : null;
 
-                                        final user = await FirebaseFirestore
-                                            .instance
-                                            .collection('Users')
-                                            .doc(userData['userId'])
-                                            .get();
-                                        plotPolylinesUser(
-                                            userData['isHome']
-                                                ? user['homeLat']
-                                                : user['officeLat'],
-                                            userData['isHome']
-                                                ? user['homeLng']
-                                                : user['officeLng']);
-                                        setState(() {
-                                          _timer!.cancel();
-                                        });
-                                      } else if (userData['status'] ==
-                                          'On the way') {
-                                        await FirebaseFirestore.instance
-                                            .collection('Orders')
-                                            .doc(orderId)
-                                            .update({
-                                          'status': 'Delivered',
-                                          'completedAt':
-                                              FieldValue.serverTimestamp()
-                                        }).whenComplete(
-                                          () async {
+                                      if (orderData == null &&
+                                          purchaseData == null) {
+                                        return const Center(
+                                            child: Text('No data found.'));
+                                      }
+
+                                      // Handle Purchase collection
+                                      if (purchaseData != null) {
+                                        return SlideAction(
+                                          outerColor: purchaseData['status'] ==
+                                                  'On the way'
+                                              ? Colors.green
+                                              : secondary,
+                                          innerColor: white,
+                                          text: purchaseData['status'] ==
+                                                  'On the way'
+                                              ? 'Delivery Complete'
+                                              : 'Delivering...',
+                                          textStyle: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 18,
+                                              fontFamily: "Medium"),
+                                          onSubmit: () async {
+                                            if (purchaseData['status'] ==
+                                                'On the way') {
+                                              await FirebaseFirestore.instance
+                                                  .collection('Purchase')
+                                                  .doc(orderId)
+                                                  .update({
+                                                'status': 'Delivered',
+                                                'completedAt':
+                                                    FieldValue.serverTimestamp()
+                                              }).whenComplete(() async {
+                                                await FirebaseFirestore.instance
+                                                    .collection('Riders')
+                                                    .doc(myId)
+                                                    .update({
+                                                  'isActive': true
+                                                }).whenComplete(() {
+                                                  Navigator.of(context)
+                                                      .pushAndRemoveUntil(
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const HomeScreen(),
+                                                    ),
+                                                    (route) => true,
+                                                  );
+                                                });
+                                              });
+                                            }
+                                          },
+                                        );
+                                      }
+
+                                      // Handle Orders collection
+                                      return SlideAction(
+                                        outerColor:
+                                            orderData!['status'] == 'On the way'
+                                                ? Colors.green
+                                                : secondary,
+                                        innerColor: white,
+                                        text:
+                                            orderData['status'] == 'On the way'
+                                                ? 'Mark as Completed'
+                                                : orderData['status'] ==
+                                                        'For Pick-up'
+                                                    ? 'Order Picked Up'
+                                                    : 'Preparing Food...',
+                                        textStyle: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 18,
+                                            fontFamily: "Medium"),
+                                        onSubmit: () async {
+                                          if (orderData['status'] ==
+                                              'For Pick-up') {
                                             await FirebaseFirestore.instance
-                                                .collection('Riders')
-                                                .doc(myId)
+                                                .collection('Orders')
+                                                .doc(orderId)
+                                                .update(
+                                                    {'status': 'On the way'});
+
+                                            final user = await FirebaseFirestore
+                                                .instance
+                                                .collection('Users')
+                                                .doc(orderData['userId'])
+                                                .get();
+                                            plotPolylinesUser(
+                                                orderData['isHome']
+                                                    ? user['homeLat']
+                                                    : user['officeLat'],
+                                                orderData['isHome']
+                                                    ? user['homeLng']
+                                                    : user['officeLng']);
+                                            setState(() {
+                                              _timer!.cancel();
+                                            });
+                                          } else if (orderData['status'] ==
+                                              'On the way') {
+                                            await FirebaseFirestore.instance
+                                                .collection('Orders')
+                                                .doc(orderId)
                                                 .update({
-                                              'isActive': true
-                                            }).whenComplete(
-                                              () {
+                                              'status': 'Delivered',
+                                              'completedAt':
+                                                  FieldValue.serverTimestamp()
+                                            }).whenComplete(() async {
+                                              await FirebaseFirestore.instance
+                                                  .collection('Riders')
+                                                  .doc(myId)
+                                                  .update({
+                                                'isActive': true
+                                              }).whenComplete(() {
                                                 Navigator.of(context)
                                                     .pushAndRemoveUntil(
                                                   MaterialPageRoute(
                                                     builder: (context) =>
                                                         const HomeScreen(),
                                                   ),
-                                                  (route) {
-                                                    return true;
-                                                  },
+                                                  (route) => true,
                                                 );
-                                              },
-                                            );
-                                          },
-                                        );
-                                      }
+                                              });
+                                            });
+                                          }
+                                        },
+                                      );
                                     },
                                   );
-                                  // return ButtonWidget(
-                                  //   color: userData['status'] == 'On the way'
-                                  //       ? Colors.green
-                                  //       : secondary,
-                                  //   label: userData['status'] == 'On the way'
-                                  //       ? 'Mark as Completed'
-                                  //       : userData['status'] == 'For Pick-up'
-                                  //           ? 'Order Picked Up'
-                                  //           : 'Preparing Food...',
-                                  //   onPressed: () async {
-                                  //     if (userData['status'] == 'For Pick-up') {
-                                  //       await FirebaseFirestore.instance
-                                  //           .collection('Orders')
-                                  //           .doc(orderId)
-                                  //           .update({'status': 'On the way'});
-
-                                  //       final user = await FirebaseFirestore
-                                  //           .instance
-                                  //           .collection('Users')
-                                  //           .doc(userData['userId'])
-                                  //           .get();
-                                  //       plotPolylinesUser(
-                                  //           userData['isHome']
-                                  //               ? user['homeLat']
-                                  //               : user['officeLat'],
-                                  //           userData['isHome']
-                                  //               ? user['homeLng']
-                                  //               : user['officeLng']);
-                                  //       setState(() {
-                                  //         _timer!.cancel();
-                                  //       });
-                                  //     } else if (userData['status'] ==
-                                  //         'On the way') {
-                                  //       await FirebaseFirestore.instance
-                                  //           .collection('Orders')
-                                  //           .doc(orderId)
-                                  //           .update({
-                                  //         'status': 'Delivered',
-                                  //         'completedAt':
-                                  //             FieldValue.serverTimestamp()
-                                  //       }).whenComplete(
-                                  //         () async {
-                                  //           await FirebaseFirestore.instance
-                                  //               .collection('Riders')
-                                  //               .doc(myId)
-                                  //               .update({
-                                  //             'isActive': true
-                                  //           }).whenComplete(
-                                  //             () {
-                                  //               Navigator.of(context)
-                                  //                   .pushAndRemoveUntil(
-                                  //                 MaterialPageRoute(
-                                  //                   builder: (context) =>
-                                  //                       const HomeScreen(),
-                                  //                 ),
-                                  //                 (route) {
-                                  //                   return true;
-                                  //                 },
-                                  //               );
-                                  //             },
-                                  //           );
-                                  //         },
-                                  //       );
-                                  //     }
-                                  //   },
-                                  // );
                                 })
                             : ButtonWidget(
                                 color: secondary,
@@ -846,7 +836,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         align: TextAlign.start,
                                         maxLines: 2,
                                         text: purchase['orderType'] == 'reserve'
-                                            ? '${DateFormat('MMMM d, yyyy h:mma').format(purchase['selectedDate'].toDate())} '
+                                            ? '${DateFormat('MMMM d, yyyy h:mma').format(purchase['selectedDateAndTime'].toDate())} '
                                             : DateFormat('MMMM d, yyyy h:mma')
                                                 .format(purchase['createdAt']
                                                     .toDate()),
@@ -1295,6 +1285,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             .collection('Riders')
                             .doc(myId)
                             .update({'isActive': false});
+
+                        await FirebaseFirestore.instance
+                            .collection('Purchase')
+                            .doc(randomOrder.id)
+                            .update({'status': 'On the way'});
 
                         final user = await FirebaseFirestore.instance
                             .collection('Purchase')

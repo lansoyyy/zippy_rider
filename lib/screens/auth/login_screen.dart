@@ -126,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ButtonWidget(
                       textColor: secondary,
                       color: Colors.white,
-                      height: 50,
+                      height: 70,
                       width: 320,
                       fontSize: 20,
                       label: 'Log in',
