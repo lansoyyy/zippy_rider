@@ -18,6 +18,7 @@ import 'package:zippy/utils/my_location.dart';
 import 'package:zippy/widgets/button_widget.dart';
 import 'package:zippy/widgets/text_widget.dart';
 import 'package:zippy/widgets/toast_widget.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -166,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
             draggable: true,
             icon: await BitmapDescriptor.fromAssetImage(
                 const ImageConfiguration(size: Size(48, 48)),
-                'assets/images/icon2.png'),
+                'assets/images/riderMarker.png'),
             markerId: const MarkerId("rider"),
             position: LatLng(value.latitude, value.longitude),
             infoWindow: const InfoWindow(title: "Rider's Location"),
@@ -624,6 +625,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               )),
                   ),
                 ),
+                if (hasAccepted) buildInfoButton(),
               ],
             )
           : const Center(
@@ -631,6 +633,253 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: secondary,
               ),
             ),
+    );
+  }
+
+  Widget buildInfoButton() {
+    if (!hasAccepted) return const SizedBox();
+
+    return Positioned(
+      bottom: MediaQuery.of(context).size.height * 0.17,
+      right: 10,
+      child: FloatingActionButton(
+        backgroundColor: secondary,
+        onPressed: () {
+          // First try Orders collection
+          FirebaseFirestore.instance
+              .collection('Orders')
+              .doc(orderId)
+              .get()
+              .then((orderDoc) {
+            if (orderDoc.exists) {
+              var data = orderDoc.data()!;
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: TextWidget(
+                    text: 'Delivery Information',
+                    fontSize: 23,
+                    fontFamily: "Bold",
+                    color: secondary,
+                  ),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          TextWidget(
+                            align: TextAlign.start,
+                            text: "Name: ",
+                            fontSize: 18,
+                            fontFamily: "Medium",
+                            color: Colors.black,
+                          ),
+                          TextWidget(
+                            align: TextAlign.start,
+                            text: "${data['customerName']}",
+                            fontSize: 18,
+                            fontFamily: "Bold",
+                            color: secondary,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          TextWidget(
+                            align: TextAlign.start,
+                            text: "Contact: ",
+                            fontSize: 18,
+                            fontFamily: "Medium",
+                            color: Colors.black,
+                          ),
+                          TextWidget(
+                            align: TextAlign.start,
+                            text: "${data['customerNumber']}",
+                            fontSize: 18,
+                            fontFamily: "Bold",
+                            color: secondary,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          TextWidget(
+                            align: TextAlign.start,
+                            text: "Total Amount: ",
+                            fontSize: 18,
+                            fontFamily: "Medium",
+                            color: Colors.black,
+                          ),
+                          TextWidget(
+                            align: TextAlign.start,
+                            text: "₱${data['total'].toStringAsFixed(2)}",
+                            fontSize: 18,
+                            fontFamily: "Bold",
+                            color: secondary,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        final customerNumber = '0${data['customerNumber']}';
+                        launchUrl(Uri.parse('tel:$customerNumber'));
+                      },
+                      child: TextWidget(
+                        text: 'Call Customer',
+                        fontSize: 16,
+                        fontFamily: "Medium",
+                        color: secondary,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: TextWidget(
+                        text: 'Close',
+                        fontSize: 16,
+                        fontFamily: "Medium",
+                        color: secondary,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              // If not in Orders, try Purchase collection
+              FirebaseFirestore.instance
+                  .collection('Purchase')
+                  .doc(orderId)
+                  .get()
+                  .then((purchaseDoc) {
+                if (purchaseDoc.exists) {
+                  var data = purchaseDoc.data()!;
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: TextWidget(
+                        text: 'Delivery Information',
+                        fontSize: 23,
+                        fontFamily: "Bold",
+                        color: secondary,
+                      ),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              TextWidget(
+                                align: TextAlign.start,
+                                text: "Name: ",
+                                fontSize: 20,
+                                fontFamily: "Medium",
+                                color: Colors.black,
+                              ),
+                              TextWidget(
+                                align: TextAlign.start,
+                                text: "${data['name']}",
+                                fontSize: 20,
+                                fontFamily: "Bold",
+                                color: secondary,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              TextWidget(
+                                align: TextAlign.start,
+                                text: "Contact: ",
+                                fontSize: 20,
+                                fontFamily: "Medium",
+                                color: Colors.black,
+                              ),
+                              TextWidget(
+                                align: TextAlign.start,
+                                text: "${data['mobile']}",
+                                fontSize: 20,
+                                fontFamily: "Bold",
+                                color: secondary,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              TextWidget(
+                                align: TextAlign.start,
+                                text: "Items: ",
+                                fontSize: 20,
+                                fontFamily: "Medium",
+                                color: Colors.black,
+                              ),
+                              TextWidget(
+                                align: TextAlign.start,
+                                text: "${data['items']}",
+                                fontSize: 20,
+                                fontFamily: "Bold",
+                                color: secondary,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              TextWidget(
+                                align: TextAlign.start,
+                                text: "Delivery Fee: ",
+                                fontSize: 20,
+                                fontFamily: "Medium",
+                                color: Colors.black,
+                              ),
+                              TextWidget(
+                                align: TextAlign.start,
+                                text: "₱${data['deliveryFeeOffer']}",
+                                fontSize: 20,
+                                fontFamily: "Bold",
+                                color: secondary,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            final customerNumber = data['mobile'];
+                            launchUrl(Uri.parse('tel:$customerNumber'));
+                          },
+                          child: TextWidget(
+                            text: 'Call Customer',
+                            fontSize: 16,
+                            fontFamily: "Medium",
+                            color: secondary,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: TextWidget(
+                            text: 'Close',
+                            fontSize: 16,
+                            fontFamily: "Medium",
+                            color: secondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              });
+            }
+          });
+        },
+        child: const Icon(Icons.info_outline, color: Colors.white),
+      ),
     );
   }
 
@@ -853,7 +1102,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         color: secondary,
                                       ),
                                       TextWidget(
-                                        text: '${purchase['deliveryFeeOffer']}',
+                                        text:
+                                            'Php ${purchase['deliveryFeeOffer']}',
                                         fontSize: 22,
                                         fontFamily: 'Bold',
                                         color: Colors.black,

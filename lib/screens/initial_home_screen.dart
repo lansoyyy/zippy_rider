@@ -48,7 +48,7 @@ class _InitialHomeScreenState extends State<InitialHomeScreen> {
                   alignment: Alignment.topRight,
                   child: Container(
                       width: 250,
-                      height: 120,
+                      height: MediaQuery.of(context).size.height * 0.1,
                       decoration: BoxDecoration(
                         border: Border.all(color: secondary, width: 1),
                         borderRadius: const BorderRadius.only(
@@ -98,7 +98,7 @@ class _InitialHomeScreenState extends State<InitialHomeScreen> {
                                   fontFamily: 'Medium',
                                   maxLines: 5,
                                   text:
-                                      'Hi! Rider,${data['name'] ?? '...'}. Ready to start your Zippy journey?',
+                                      'Hi! Rider, ${data['name'] ?? '...'}. Ready to start your Zippy journey?',
                                   fontSize: 16),
                             );
                           })),
