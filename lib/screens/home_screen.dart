@@ -18,7 +18,7 @@ import 'package:zippy/utils/my_location.dart';
 import 'package:zippy/widgets/button_widget.dart';
 import 'package:zippy/widgets/text_widget.dart';
 import 'package:zippy/widgets/toast_widget.dart';
-import 'package:url_launcher/url_launcher.dart';
+// import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -725,18 +725,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                   actions: [
-                    TextButton(
-                      onPressed: () {
-                        final customerNumber = '0${data['customerNumber']}';
-                        launchUrl(Uri.parse('tel:$customerNumber'));
-                      },
-                      child: TextWidget(
-                        text: 'Call Customer',
-                        fontSize: 16,
-                        fontFamily: "Medium",
-                        color: secondary,
-                      ),
-                    ),
+                    // TextButton(
+                    //   onPressed: () {
+                    //     final customerNumber = '0${data['customerNumber']}';
+                    //     launchUrl(Uri.parse('tel:$customerNumber'));
+                    //   },
+                    //   child: TextWidget(
+                    //     text: 'Call Customer',
+                    //     fontSize: 16,
+                    //     fontFamily: "Medium",
+                    //     color: secondary,
+                    //   ),
+                    // ),
                     TextButton(
                       onPressed: () => Navigator.pop(context),
                       child: TextWidget(
@@ -849,18 +849,18 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                       actions: [
-                        TextButton(
-                          onPressed: () {
-                            final customerNumber = data['mobile'];
-                            launchUrl(Uri.parse('tel:$customerNumber'));
-                          },
-                          child: TextWidget(
-                            text: 'Call Customer',
-                            fontSize: 16,
-                            fontFamily: "Medium",
-                            color: secondary,
-                          ),
-                        ),
+                        // TextButton(
+                        //   onPressed: () {
+                        //     final customerNumber = data['mobile'];
+                        //     launchUrl(Uri.parse('tel:$customerNumber'));
+                        //   },
+                        //   child: TextWidget(
+                        //     text: 'Call Customer',
+                        //     fontSize: 16,
+                        //     fontFamily: "Medium",
+                        //     color: secondary,
+                        //   ),
+                        // ),
                         TextButton(
                           onPressed: () => Navigator.pop(context),
                           child: TextWidget(
