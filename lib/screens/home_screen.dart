@@ -167,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
             draggable: true,
             icon: await BitmapDescriptor.fromAssetImage(
                 const ImageConfiguration(size: Size(48, 48)),
-                'assets/images/riderMarker.png'),
+                'assets/images/riderMarker2.png'),
             markerId: const MarkerId("rider"),
             position: LatLng(value.latitude, value.longitude),
             infoWindow: const InfoWindow(title: "Rider's Location"),
@@ -547,7 +547,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                         outerColor:
                                             orderData!['status'] == 'On the way'
                                                 ? Colors.green
-                                                : secondary,
+                                                : orderData['status'] ==
+                                                        'For Pick-up'
+                                                    ? Colors.deepOrange
+                                                    : secondary,
                                         innerColor: white,
                                         text:
                                             orderData['status'] == 'On the way'
@@ -1523,7 +1526,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   SlideAction(
                     outerColor: secondary,
                     innerColor: white,
-                    text: "Slide to Accept Booking",
+                    text: "Accept Booking",
                     textStyle: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
