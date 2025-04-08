@@ -18,7 +18,6 @@ import 'package:zippy/utils/my_location.dart';
 import 'package:zippy/widgets/button_widget.dart';
 import 'package:zippy/widgets/text_widget.dart';
 import 'package:zippy/widgets/toast_widget.dart';
-// import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -439,7 +438,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Align(
                   alignment: Alignment.bottomLeft,
                   child: Container(
-                    height: 115,
+                    height: MediaQuery.of(context).size.height * 0.145,
                     width: double.infinity,
                     decoration: const BoxDecoration(
                       borderRadius: BorderRadius.only(
@@ -453,144 +452,135 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: Colors.white,
                     ),
                     child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: hasAccepted
-                            ? StreamBuilder<DocumentSnapshot>(
-                                stream: FirebaseFirestore.instance
-                                    .collection('Orders')
-                                    .doc(orderId)
-                                    .snapshots(),
-                                builder: (context,
-                                    AsyncSnapshot<DocumentSnapshot>
-                                        orderSnapshot) {
-                                  return StreamBuilder<DocumentSnapshot>(
-                                    stream: FirebaseFirestore.instance
-                                        .collection('Purchase')
-                                        .doc(orderId)
-                                        .snapshots(),
-                                    builder: (context,
-                                        AsyncSnapshot<DocumentSnapshot>
-                                            purchaseSnapshot) {
-                                      if (!orderSnapshot.hasData &&
-                                          !purchaseSnapshot.hasData) {
-                                        return const Center(
-                                            child: CircularProgressIndicator());
-                                      }
+                      padding: const EdgeInsets.all(30.0),
+                      child: hasAccepted
+                          ? StreamBuilder<DocumentSnapshot>(
+                              stream: FirebaseFirestore.instance
+                                  .collection('Orders')
+                                  .doc(orderId)
+                                  .snapshots(),
+                              builder: (context,
+                                  AsyncSnapshot<DocumentSnapshot>
+                                      orderSnapshot) {
+                                return StreamBuilder<DocumentSnapshot>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection('Purchase')
+                                      .doc(orderId)
+                                      .snapshots(),
+                                  builder: (context,
+                                      AsyncSnapshot<DocumentSnapshot>
+                                          purchaseSnapshot) {
+                                    if (!orderSnapshot.hasData &&
+                                        !purchaseSnapshot.hasData) {
+                                      return StreamBuilder<DocumentSnapshot>(
+                                        stream: FirebaseFirestore.instance
+                                            .collection('Ride Bookings')
+                                            .doc(orderId)
+                                            .snapshots(),
+                                        builder: (context,
+                                            AsyncSnapshot<DocumentSnapshot>
+                                                rideSnapshot) {
+                                          if (!rideSnapshot.hasData) {
+                                            return const Center(
+                                                child:
+                                                    CircularProgressIndicator());
+                                          }
 
-                                      final orderData = orderSnapshot.hasData
-                                          ? orderSnapshot.data?.data()
-                                              as Map<String, dynamic>?
-                                          : null;
+                                          final rideData = rideSnapshot.data
+                                              ?.data() as Map<String, dynamic>?;
 
-                                      final purchaseData =
-                                          purchaseSnapshot.hasData
-                                              ? purchaseSnapshot.data?.data()
-                                                  as Map<String, dynamic>?
-                                              : null;
+                                          if (rideData == null) {
+                                            return const Center(
+                                                child: Text('No data found.'));
+                                          }
 
-                                      if (orderData == null &&
-                                          purchaseData == null) {
-                                        return const Center(
-                                            child: Text('No data found.'));
-                                      }
-
-                                      // Handle Purchase collection
-                                      if (purchaseData != null) {
-                                        return SlideAction(
-                                          outerColor: purchaseData['status'] ==
-                                                  'On the way'
-                                              ? Colors.green
-                                              : secondary,
-                                          innerColor: white,
-                                          text: purchaseData['status'] ==
-                                                  'On the way'
-                                              ? 'Delivery Complete'
-                                              : 'Delivering...',
-                                          textStyle: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 18,
-                                              fontFamily: "Medium"),
-                                          onSubmit: () async {
-                                            if (purchaseData['status'] ==
-                                                'On the way') {
-                                              await FirebaseFirestore.instance
-                                                  .collection('Purchase')
-                                                  .doc(orderId)
-                                                  .update({
-                                                'status': 'Delivered',
-                                                'completedAt':
-                                                    FieldValue.serverTimestamp()
-                                              }).whenComplete(() async {
-                                                await FirebaseFirestore.instance
-                                                    .collection('Riders')
-                                                    .doc(myId)
-                                                    .update({
-                                                  'isActive': true
-                                                }).whenComplete(() {
-                                                  Navigator.of(context)
-                                                      .pushAndRemoveUntil(
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          const HomeScreen(),
-                                                    ),
-                                                    (route) => true,
-                                                  );
-                                                });
-                                              });
-                                            }
-                                          },
-                                        );
-                                      }
-
-                                      // Handle Orders collection
-                                      return SlideAction(
-                                        outerColor:
-                                            orderData!['status'] == 'On the way'
+                                          return SlideAction(
+                                            outerColor: rideData['status'] ==
+                                                    'On the way'
                                                 ? Colors.green
-                                                : orderData['status'] ==
-                                                        'For Pick-up'
-                                                    ? Colors.deepOrange
-                                                    : secondary,
+                                                : secondary,
+                                            innerColor: white,
+                                            text: rideData['status'] ==
+                                                    'On the way'
+                                                ? 'Ride Complete'
+                                                : 'Driving...',
+                                            textStyle: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 18,
+                                                fontFamily: "Medium"),
+                                            onSubmit: () async {
+                                              if (rideData['status'] ==
+                                                  'On the way') {
+                                                await FirebaseFirestore.instance
+                                                    .collection('Ride Bookings')
+                                                    .doc(orderId)
+                                                    .update({
+                                                  'status': 'Completed',
+                                                  'completedAt': FieldValue
+                                                      .serverTimestamp()
+                                                }).whenComplete(() async {
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection('Riders')
+                                                      .doc(myId)
+                                                      .update({
+                                                    'isActive': true
+                                                  }).whenComplete(() {
+                                                    Navigator.of(context)
+                                                        .pushAndRemoveUntil(
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            const HomeScreen(),
+                                                      ),
+                                                      (route) => true,
+                                                    );
+                                                  });
+                                                });
+                                              }
+                                            },
+                                          );
+                                        },
+                                      );
+                                    }
+
+                                    final orderData = orderSnapshot.hasData
+                                        ? orderSnapshot.data?.data()
+                                            as Map<String, dynamic>?
+                                        : null;
+
+                                    final purchaseData =
+                                        purchaseSnapshot.hasData
+                                            ? purchaseSnapshot.data?.data()
+                                                as Map<String, dynamic>?
+                                            : null;
+
+                                    if (orderData == null &&
+                                        purchaseData == null) {
+                                      return const Center(
+                                          child: Text('No data found.'));
+                                    }
+
+                                    // Handle Purchase collection
+                                    if (purchaseData != null) {
+                                      return SlideAction(
+                                        outerColor: purchaseData['status'] ==
+                                                'On the way'
+                                            ? Colors.green
+                                            : secondary,
                                         innerColor: white,
-                                        text:
-                                            orderData['status'] == 'On the way'
-                                                ? 'Mark as Completed'
-                                                : orderData['status'] ==
-                                                        'For Pick-up'
-                                                    ? 'Order Picked Up'
-                                                    : 'Preparing Food...',
+                                        text: purchaseData['status'] ==
+                                                'On the way'
+                                            ? 'Delivery Complete'
+                                            : 'Delivering...',
                                         textStyle: const TextStyle(
                                             color: Colors.white,
                                             fontSize: 18,
                                             fontFamily: "Medium"),
                                         onSubmit: () async {
-                                          if (orderData['status'] ==
-                                              'For Pick-up') {
-                                            await FirebaseFirestore.instance
-                                                .collection('Orders')
-                                                .doc(orderId)
-                                                .update(
-                                                    {'status': 'On the way'});
-
-                                            final user = await FirebaseFirestore
-                                                .instance
-                                                .collection('Users')
-                                                .doc(orderData['userId'])
-                                                .get();
-                                            plotPolylinesUser(
-                                                orderData['isHome']
-                                                    ? user['homeLat']
-                                                    : user['officeLat'],
-                                                orderData['isHome']
-                                                    ? user['homeLng']
-                                                    : user['officeLng']);
-                                            setState(() {
-                                              _timer!.cancel();
-                                            });
-                                          } else if (orderData['status'] ==
+                                          if (purchaseData['status'] ==
                                               'On the way') {
                                             await FirebaseFirestore.instance
-                                                .collection('Orders')
+                                                .collection('Purchase')
                                                 .doc(orderId)
                                                 .update({
                                               'status': 'Delivered',
@@ -616,16 +606,104 @@ class _HomeScreenState extends State<HomeScreen> {
                                           }
                                         },
                                       );
-                                    },
-                                  );
-                                })
-                            : ButtonWidget(
-                                color: secondary,
-                                label: 'Search Bookings',
-                                onPressed: () {
-                                  showOrderListDialog();
-                                },
-                              )),
+                                    }
+
+                                    // Handle Orders collection
+                                    return SlideAction(
+                                      outerColor: orderData!['status'] ==
+                                              'On the way'
+                                          ? Colors.green
+                                          : orderData['status'] == 'For Pick-up'
+                                              ? Colors.deepOrange
+                                              : secondary,
+                                      innerColor: white,
+                                      text: orderData['status'] == 'On the way'
+                                          ? 'Mark as Completed'
+                                          : orderData['status'] == 'For Pick-up'
+                                              ? 'Order Picked Up'
+                                              : 'Preparing Food...',
+                                      textStyle: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontFamily: "Medium"),
+                                      onSubmit: () async {
+                                        if (orderData['status'] ==
+                                            'For Pick-up') {
+                                          await FirebaseFirestore.instance
+                                              .collection('Orders')
+                                              .doc(orderId)
+                                              .update({'status': 'On the way'});
+
+                                          final user = await FirebaseFirestore
+                                              .instance
+                                              .collection('Users')
+                                              .doc(orderData['userId'])
+                                              .get();
+                                          plotPolylinesUser(
+                                              orderData['isHome']
+                                                  ? user['homeLat']
+                                                  : user['officeLat'],
+                                              orderData['isHome']
+                                                  ? user['homeLng']
+                                                  : user['officeLng']);
+                                          setState(() {
+                                            _timer!.cancel();
+                                          });
+                                        } else if (orderData['status'] ==
+                                            'On the way') {
+                                          await FirebaseFirestore.instance
+                                              .collection('Orders')
+                                              .doc(orderId)
+                                              .update({
+                                            'status': 'Delivered',
+                                            'completedAt':
+                                                FieldValue.serverTimestamp()
+                                          }).whenComplete(() async {
+                                            await FirebaseFirestore.instance
+                                                .collection('Riders')
+                                                .doc(myId)
+                                                .update({
+                                              'isActive': true
+                                            }).whenComplete(() {
+                                              Navigator.of(context)
+                                                  .pushAndRemoveUntil(
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const HomeScreen(),
+                                                ),
+                                                (route) => true,
+                                              );
+                                            });
+                                          });
+                                        }
+                                      },
+                                    );
+                                  },
+                                );
+                              })
+                          : GestureDetector(
+                              onTap: () {
+                                showOrderListDialog();
+                              },
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.8,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.07,
+                                decoration: BoxDecoration(
+                                  color: secondary,
+                                  borderRadius: BorderRadius.circular(25),
+                                ),
+                                child: Center(
+                                  child: TextWidget(
+                                    text: "Search Bookings",
+                                    fontSize: 18,
+                                    color: white,
+                                    fontFamily: 'Bold',
+                                  ),
+                                ),
+                              ),
+                            ),
+                    ),
                   ),
                 ),
                 if (hasAccepted) buildInfoButton(),
@@ -728,18 +806,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                   actions: [
-                    // TextButton(
-                    //   onPressed: () {
-                    //     final customerNumber = '0${data['customerNumber']}';
-                    //     launchUrl(Uri.parse('tel:$customerNumber'));
-                    //   },
-                    //   child: TextWidget(
-                    //     text: 'Call Customer',
-                    //     fontSize: 16,
-                    //     fontFamily: "Medium",
-                    //     color: secondary,
-                    //   ),
-                    // ),
                     TextButton(
                       onPressed: () => Navigator.pop(context),
                       child: TextWidget(
@@ -852,18 +918,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                       actions: [
-                        // TextButton(
-                        //   onPressed: () {
-                        //     final customerNumber = data['mobile'];
-                        //     launchUrl(Uri.parse('tel:$customerNumber'));
-                        //   },
-                        //   child: TextWidget(
-                        //     text: 'Call Customer',
-                        //     fontSize: 16,
-                        //     fontFamily: "Medium",
-                        //     color: secondary,
-                        //   ),
-                        // ),
                         TextButton(
                           onPressed: () => Navigator.pop(context),
                           child: TextWidget(
@@ -876,6 +930,139 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   );
+                } else {
+                  // If not in Purchase, try Ride Bookings collection
+                  FirebaseFirestore.instance
+                      .collection('Ride Bookings')
+                      .doc(orderId)
+                      .get()
+                      .then((rideDoc) {
+                    if (rideDoc.exists) {
+                      var data = rideDoc.data()!;
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: TextWidget(
+                            text: 'Ride Information',
+                            fontSize: 23,
+                            fontFamily: "Bold",
+                            color: secondary,
+                          ),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  TextWidget(
+                                    align: TextAlign.start,
+                                    text: "Customer: ",
+                                    fontSize: 18,
+                                    fontFamily: "Medium",
+                                    color: Colors.black,
+                                  ),
+                                  TextWidget(
+                                    align: TextAlign.start,
+                                    text: "${data['customerName']}",
+                                    fontSize: 18,
+                                    fontFamily: "Bold",
+                                    color: secondary,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  TextWidget(
+                                    align: TextAlign.start,
+                                    text: "Contact: ",
+                                    fontSize: 18,
+                                    fontFamily: "Medium",
+                                    color: Colors.black,
+                                  ),
+                                  TextWidget(
+                                    align: TextAlign.start,
+                                    text: "${data['customerNumber']}",
+                                    fontSize: 18,
+                                    fontFamily: "Bold",
+                                    color: secondary,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  TextWidget(
+                                    align: TextAlign.start,
+                                    text: "Pickup: ",
+                                    fontSize: 18,
+                                    fontFamily: "Medium",
+                                    color: Colors.black,
+                                  ),
+                                  TextWidget(
+                                    align: TextAlign.start,
+                                    text: "${data['pickupLocationName']}",
+                                    fontSize: 18,
+                                    fontFamily: "Bold",
+                                    color: secondary,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  TextWidget(
+                                    align: TextAlign.start,
+                                    text: "Dropoff: ",
+                                    fontSize: 18,
+                                    fontFamily: "Medium",
+                                    color: Colors.black,
+                                  ),
+                                  TextWidget(
+                                    align: TextAlign.start,
+                                    text: "${data['dropoffLocationName']}",
+                                    fontSize: 18,
+                                    fontFamily: "Bold",
+                                    color: secondary,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  TextWidget(
+                                    align: TextAlign.start,
+                                    text: "Fare: ",
+                                    fontSize: 18,
+                                    fontFamily: "Medium",
+                                    color: Colors.black,
+                                  ),
+                                  TextWidget(
+                                    align: TextAlign.start,
+                                    text: "₱${data['fare'].toStringAsFixed(2)}",
+                                    fontSize: 18,
+                                    fontFamily: "Bold",
+                                    color: secondary,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: TextWidget(
+                                text: 'Close',
+                                fontSize: 16,
+                                fontFamily: "Medium",
+                                color: secondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                  });
                 }
               });
             }
@@ -1123,6 +1310,116 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
               ),
+              StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('Ride Bookings')
+                    .where('driverId', isEqualTo: myId)
+                    .where('status', isEqualTo: 'Pending')
+                    .snapshots(),
+                builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(child: Text('Loading'));
+                  } else if (snapshot.hasError) {
+                    return const Center(child: Text('Something went wrong'));
+                  } else if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  final rides = snapshot.data!.docs;
+
+                  if (rides.isEmpty) {
+                    return Center(
+                      child: TextWidget(
+                        text: 'No ride bookings found.',
+                        color: secondary,
+                        fontSize: 18,
+                        fontFamily: 'Medium',
+                      ),
+                    );
+                  }
+
+                  return SizedBox(
+                    height: 500,
+                    width: 500,
+                    child: ListView.builder(
+                      itemCount: rides.length,
+                      itemBuilder: (context, index) {
+                        var ride = rides[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(
+                              left: 5, right: 5, bottom: 5, top: 5),
+                          child: GestureDetector(
+                            onTap: () {
+                              showOrderDialog(ride);
+                            },
+                            child: Container(
+                              height: MediaQuery.of(context).size.height * 0.16,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: secondary),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(15),
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      TextWidget(
+                                        maxLines: 2,
+                                        text: 'Ride Booking',
+                                        fontSize: 20,
+                                        fontFamily: 'Bold',
+                                        color: secondary,
+                                      ),
+                                      TextWidget(
+                                        align: TextAlign.start,
+                                        maxLines: 2,
+                                        text: DateFormat('MMMM d, yyyy h:mma')
+                                            .format(ride['date'].toDate()),
+                                        fontSize: 14,
+                                        fontFamily: 'Regular',
+                                        color: secondary,
+                                      ),
+                                      TextWidget(
+                                        align: TextAlign.start,
+                                        maxLines: 2,
+                                        text:
+                                            'From: ${ride['pickupLocationName']}',
+                                        fontSize: 14,
+                                        fontFamily: 'Regular',
+                                        color: secondary,
+                                      ),
+                                      TextWidget(
+                                        align: TextAlign.start,
+                                        maxLines: 2,
+                                        text:
+                                            'To: ${ride['dropoffLocationName']}',
+                                        fontSize: 14,
+                                        fontFamily: 'Regular',
+                                        color: secondary,
+                                      ),
+                                      TextWidget(
+                                        text:
+                                            'Php ${ride['fare'].toStringAsFixed(2)}',
+                                        fontSize: 22,
+                                        fontFamily: 'Bold',
+                                        color: Colors.black,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
             ],
           ),
           actions: [
@@ -1161,7 +1458,9 @@ class _HomeScreenState extends State<HomeScreen> {
               TextWidget(
                 text: randomOrder['type'] == 'Purchase'
                     ? "Purchase Delivery"
-                    : "Food Delivery",
+                    : randomOrder['type'] == 'Ride'
+                        ? "Ride Booking"
+                        : "Food Delivery",
                 fontSize: 25,
                 fontFamily: "Bold",
                 color: secondary,
@@ -1173,7 +1472,8 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (randomOrder['type'] != 'Purchase') ...[
+                if (randomOrder['type'] != 'Purchase' &&
+                    randomOrder['type'] != 'Ride') ...[
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1215,12 +1515,36 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ],
+                if (randomOrder['type'] == 'Ride') ...[
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextWidget(
+                        text: "Ride Details",
+                        fontSize: 18,
+                        fontFamily: "Bold",
+                        color: black,
+                      ),
+                      TextWidget(
+                        text: '${randomOrder.id ?? 'N/A'}',
+                        fontSize: 20,
+                        fontFamily: "Bold",
+                        color: secondary,
+                      ),
+                      const Divider(
+                        color: secondary,
+                      ),
+                    ],
+                  ),
+                ],
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     TextWidget(
-                      text: "Address: ",
+                      text: randomOrder['type'] == 'Ride'
+                          ? "Pickup Location: "
+                          : "Address: ",
                       fontSize: 18,
                       fontFamily: "Bold",
                       color: black,
@@ -1229,7 +1553,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       align: TextAlign.start,
                       text: randomOrder['type'] == 'Purchase'
                           ? '${randomOrder?['deliveryAddress'] ?? 'N/A'}'
-                          : '${randomOrder?['deliveryAdd'] ?? 'N/A'}',
+                          : randomOrder['type'] == 'Ride'
+                              ? '${randomOrder?['pickupLocationName'] ?? 'N/A'}'
+                              : '${randomOrder?['deliveryAdd'] ?? 'N/A'}',
                       fontSize: 20,
                       fontFamily: "Bold",
                       color: secondary,
@@ -1239,7 +1565,31 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 ),
-                if (randomOrder['type'] != 'Purchase') ...[
+                if (randomOrder['type'] == 'Ride') ...[
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextWidget(
+                        text: "Dropoff Location: ",
+                        fontSize: 18,
+                        fontFamily: "Bold",
+                        color: black,
+                      ),
+                      TextWidget(
+                        align: TextAlign.start,
+                        text: '${randomOrder?['dropoffLocationName'] ?? 'N/A'}',
+                        fontSize: 20,
+                        fontFamily: "Bold",
+                        color: secondary,
+                      ),
+                      const Divider(
+                        color: secondary,
+                      ),
+                    ],
+                  ),
+                ],
+                if (randomOrder['type'] != 'Purchase' &&
+                    randomOrder['type'] != 'Ride') ...[
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1301,7 +1651,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-                ] else ...[
+                ] else if (randomOrder['type'] == 'Purchase') ...[
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1407,8 +1757,50 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
+                ] else if (randomOrder['type'] == 'Ride') ...[
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextWidget(
+                        text: "Customer Name: ",
+                        fontSize: 18,
+                        fontFamily: "Bold",
+                        color: black,
+                      ),
+                      TextWidget(
+                        text: '${randomOrder?['customerName'] ?? 'N/A'}',
+                        fontSize: 20,
+                        fontFamily: "Bold",
+                        color: secondary,
+                      ),
+                      const Divider(
+                        color: secondary,
+                      ),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextWidget(
+                        text: "Customer Contact: ",
+                        fontSize: 18,
+                        fontFamily: "Bold",
+                        color: black,
+                      ),
+                      TextWidget(
+                        text: '${randomOrder?['customerNumber'] ?? 'N/A'}',
+                        fontSize: 20,
+                        fontFamily: "Bold",
+                        color: secondary,
+                      ),
+                      const Divider(
+                        color: secondary,
+                      ),
+                    ],
+                  ),
                 ],
-                if (randomOrder['type'] != 'Purchase') ...[
+                if (randomOrder['type'] != 'Purchase' &&
+                    randomOrder['type'] != 'Ride') ...[
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1514,6 +1906,32 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
+                ] else if (randomOrder['type'] == 'Ride') ...[
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          TextWidget(
+                            text: "Fare: ",
+                            fontSize: 20,
+                            fontFamily: "Bold",
+                            color: black,
+                          ),
+                          TextWidget(
+                            text: randomOrder != null &&
+                                    randomOrder?['fare'] != null
+                                ? '₱${(randomOrder?['fare'] as num).toStringAsFixed(2)}'
+                                : 'N/A',
+                            fontSize: 20,
+                            fontFamily: "Bold",
+                            color: secondary,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ],
               ],
             ),
@@ -1557,6 +1975,34 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
 
                         plotPolylines(user['deliveryLat'], user['deliveryLng']);
+                        setState(() {
+                          orderId = randomOrder.id;
+                          hasAccepted = true;
+                        });
+
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop();
+                      } else if (randomOrder['type'] == 'Ride') {
+                        await FirebaseFirestore.instance
+                            .collection('Riders')
+                            .doc(myId)
+                            .update({'isActive': false});
+
+                        await FirebaseFirestore.instance
+                            .collection('Ride Bookings')
+                            .doc(randomOrder.id)
+                            .update({'status': 'On the way'});
+
+                        mapController!.animateCamera(
+                          CameraUpdate.newLatLngZoom(
+                            LatLng(randomOrder['pickupLocation'].latitude,
+                                randomOrder['pickupLocation'].longitude),
+                            18.0,
+                          ),
+                        );
+
+                        plotPolylines(randomOrder['pickupLocation'].latitude,
+                            randomOrder['pickupLocation'].longitude);
                         setState(() {
                           orderId = randomOrder.id;
                           hasAccepted = true;

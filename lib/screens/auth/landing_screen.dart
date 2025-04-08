@@ -33,17 +33,40 @@ class LandingScreen extends StatelessWidget {
             const SizedBox(
               height: 100,
             ),
-            ButtonWidget(
-              height: 70,
-              textColor: Colors.white,
-              color: secondary,
-              label: 'Get Started',
-              onPressed: () {
+            GestureDetector(
+              onTap: () {
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(builder: (context) => const LoginScreen()),
                 );
               },
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.8,
+                height: MediaQuery.of(context).size.height * 0.07,
+                decoration: BoxDecoration(
+                  color: secondary,
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: Center(
+                  child: TextWidget(
+                    text: "Get Started",
+                    fontSize: 18,
+                    color: white,
+                    fontFamily: 'Bold',
+                  ),
+                ),
+              ),
             ),
+            // ButtonWidget(
+            //   height: 70,
+            //   textColor: Colors.white,
+            //   color: secondary,
+            //   label: 'Get Started',
+            //   onPressed: () {
+            //     Navigator.of(context).pushReplacement(
+            //       MaterialPageRoute(builder: (context) => const LoginScreen()),
+            //     );
+            //   },
+            // ),
           ],
         ),
       ),

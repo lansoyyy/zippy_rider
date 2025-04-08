@@ -123,17 +123,38 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(
                       height: 20,
                     ),
-                    ButtonWidget(
-                      textColor: secondary,
-                      color: Colors.white,
-                      height: 70,
-                      width: 320,
-                      fontSize: 20,
-                      label: 'Log in',
-                      onPressed: () {
+                    GestureDetector(
+                      onTap: () {
                         login(context);
                       },
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.85,
+                        height: MediaQuery.of(context).size.height * 0.07,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        child: Center(
+                          child: TextWidget(
+                            text: "Log in",
+                            fontSize: 18,
+                            color: secondary,
+                            fontFamily: 'Bold',
+                          ),
+                        ),
+                      ),
                     ),
+                    // ButtonWidget(
+                    //   textColor: secondary,
+                    //   color: Colors.white,
+                    //   height: 70,
+                    //   width: 320,
+                    //   fontSize: 20,
+                    //   label: 'Log in',
+                    //   onPressed: () {
+                    //     login(context);
+                    //   },
+                    // ),
                     const SizedBox(
                       height: 20,
                     ),
