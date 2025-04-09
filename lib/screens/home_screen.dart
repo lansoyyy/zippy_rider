@@ -438,7 +438,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Align(
                   alignment: Alignment.bottomLeft,
                   child: Container(
-                    height: MediaQuery.of(context).size.height * 0.145,
+                    height: MediaQuery.of(context).size.height * 0.16,
                     width: double.infinity,
                     decoration: const BoxDecoration(
                       borderRadius: BorderRadius.only(
@@ -498,18 +498,34 @@ class _HomeScreenState extends State<HomeScreen> {
                                             outerColor: rideData['status'] ==
                                                     'On the way'
                                                 ? Colors.green
-                                                : secondary,
+                                                : rideData['status'] ==
+                                                        'Accepted'
+                                                    ? Colors.orange
+                                                    : secondary,
                                             innerColor: white,
                                             text: rideData['status'] ==
                                                     'On the way'
                                                 ? 'Ride Complete'
-                                                : 'Driving...',
+                                                : rideData['status'] ==
+                                                        'Accepted'
+                                                    ? 'Picked-up Customer'
+                                                    : 'Driving...',
                                             textStyle: const TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 18,
                                                 fontFamily: "Medium"),
                                             onSubmit: () async {
                                               if (rideData['status'] ==
+                                                  'Accepted') {
+                                                await FirebaseFirestore.instance
+                                                    .collection('Ride Bookings')
+                                                    .doc(orderId)
+                                                    .update({
+                                                  'status': 'On the way',
+                                                  'pickedUpAt': FieldValue
+                                                      .serverTimestamp()
+                                                });
+                                              } else if (rideData['status'] ==
                                                   'On the way') {
                                                 await FirebaseFirestore.instance
                                                     .collection('Ride Bookings')
@@ -556,8 +572,91 @@ class _HomeScreenState extends State<HomeScreen> {
 
                                     if (orderData == null &&
                                         purchaseData == null) {
-                                      return const Center(
-                                          child: Text('No data found.'));
+                                      return StreamBuilder<DocumentSnapshot>(
+                                        stream: FirebaseFirestore.instance
+                                            .collection('Ride Bookings')
+                                            .doc(orderId)
+                                            .snapshots(),
+                                        builder: (context,
+                                            AsyncSnapshot<DocumentSnapshot>
+                                                rideSnapshot) {
+                                          if (!rideSnapshot.hasData) {
+                                            return const Center(
+                                                child:
+                                                    CircularProgressIndicator());
+                                          }
+
+                                          final rideData = rideSnapshot.data
+                                              ?.data() as Map<String, dynamic>?;
+
+                                          if (rideData == null) {
+                                            return const Center(
+                                                child: Text('No data found.'));
+                                          }
+
+                                          return SlideAction(
+                                            outerColor: rideData['status'] ==
+                                                    'On the way'
+                                                ? Colors.green
+                                                : rideData['status'] ==
+                                                        'Accepted'
+                                                    ? Colors.orange
+                                                    : secondary,
+                                            innerColor: white,
+                                            text: rideData['status'] ==
+                                                    'On the way'
+                                                ? 'Ride Complete'
+                                                : rideData['status'] ==
+                                                        'Accepted'
+                                                    ? 'Picked-up Customer'
+                                                    : 'Driving...',
+                                            textStyle: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 18,
+                                                fontFamily: "Medium"),
+                                            onSubmit: () async {
+                                              if (rideData['status'] ==
+                                                  'Accepted') {
+                                                await FirebaseFirestore.instance
+                                                    .collection('Ride Bookings')
+                                                    .doc(orderId)
+                                                    .update({
+                                                  'status': 'On the way',
+                                                  'pickedUpAt': FieldValue
+                                                      .serverTimestamp()
+                                                });
+                                              } else if (rideData['status'] ==
+                                                  'On the way') {
+                                                await FirebaseFirestore.instance
+                                                    .collection('Ride Bookings')
+                                                    .doc(orderId)
+                                                    .update({
+                                                  'status': 'Completed',
+                                                  'completedAt': FieldValue
+                                                      .serverTimestamp()
+                                                }).whenComplete(() async {
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection('Riders')
+                                                      .doc(myId)
+                                                      .update({
+                                                    'isActive': true
+                                                  }).whenComplete(() {
+                                                    Navigator.of(context)
+                                                        .pushAndRemoveUntil(
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            const HomeScreen(),
+                                                      ),
+                                                      (route) => true,
+                                                    );
+                                                  });
+                                                });
+                                              }
+                                            },
+                                          );
+                                        },
+                                      );
                                     }
 
                                     // Handle Purchase collection
@@ -1550,6 +1649,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: black,
                     ),
                     TextWidget(
+                      maxLines: 10,
                       align: TextAlign.start,
                       text: randomOrder['type'] == 'Purchase'
                           ? '${randomOrder?['deliveryAddress'] ?? 'N/A'}'
@@ -1576,6 +1676,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: black,
                       ),
                       TextWidget(
+                        maxLines: 10,
                         align: TextAlign.start,
                         text: '${randomOrder?['dropoffLocationName'] ?? 'N/A'}',
                         fontSize: 20,
@@ -1991,7 +2092,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         await FirebaseFirestore.instance
                             .collection('Ride Bookings')
                             .doc(randomOrder.id)
-                            .update({'status': 'On the way'});
+                            .update({'status': 'Accepted'});
 
                         mapController!.animateCamera(
                           CameraUpdate.newLatLngZoom(
