@@ -6,7 +6,7 @@ String logo = 'assets/images/logo.png';
 String label = 'assets/images/label.png';
 String avatar = 'assets/images/avatar.png';
 String icon = 'assets/images/icon.png';
-const kGoogleApiKey = 'AIzaSyALBovovWA3wdK7BTeKqhpDlBEJMAwQrh0';
+const kGoogleApiKey = 'AIzaSyArGfsiZq0QL1nLRdb2cDcOJQISQmh3SCg';
 
 List socials = [
   'assets/images/phone.png',
